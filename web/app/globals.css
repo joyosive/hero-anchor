@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0A0B09;
+  --color-panel: #101209;
+  --color-panel2: #0E100C;
+  --color-panel3: #0B0D09;
+  --color-line: rgba(170, 255, 0, 0.18);
+  --color-line2: rgba(170, 255, 0, 0.10);
+  --color-acid: #AAFF00;
+  --color-acidsoft: rgba(170, 255, 0, 0.5);
+  --color-white: #ECEEE6;
+  --color-muted: #7A7E72;
+  --color-dim: #4C4F47;
+  --color-err: #FF5470;
+  --color-cyan: #22D3EE;
+  --color-amber: #FFB020;
+
+  --font-disp: var(--font-space-grotesk), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-body: var(--font-inter), sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  background-image:
+    linear-gradient(rgba(170, 255, 0, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 255, 0, 0.022) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+a {
+  color: var(--color-acid);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* range slider — themed to identity */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 99px;
+  background: #20241a;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-acid);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(170, 255, 0, 0.5);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-acid);
+  cursor: pointer;
+}
+
+/* motion keyframes */
+@keyframes mpulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.meter-pulse i {
+  animation: mpulse 0.5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

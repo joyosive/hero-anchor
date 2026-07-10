@@ -1,0 +1,20 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["node_modules", "lib"]
+solc = "0.8.25"
+evm_version = "cancun"           # CoFHE ACL uses transient storage (tstore)
+optimizer = true
+optimizer_runs = 200
+auto_detect_remappings = false
+code_size_limit = 100000         # CoFHE mock stack exceeds the 24KB EIP-170 limit in tests
+fs_permissions = [{ access = "read", path = "out" }]   # deployMocks() reads artifacts
+
+[rpc_endpoints]
+arbitrum_sepolia = "${RPC_URL}"
+
+# One Etherscan v2 API key verifies on Arbiscan too (legacy Arbiscan keys are deprecated).
+[etherscan]
+arbitrum_sepolia = { key = "${ETHERSCAN_API_KEY}", chain = 421614 }

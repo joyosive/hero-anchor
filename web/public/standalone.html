@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero · Confidential Proof of Action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  :root{
+    --bg:#0A0B09; --panel:#101209; --panel-2:#0E100C; --panel-3:#0B0D09;
+    --line:rgba(170,255,0,.18); --line-2:rgba(170,255,0,.10);
+    --acid:#AAFF00; --acid-dim:rgba(170,255,0,.5);
+    --white:#ECEEE6; --muted:#7A7E72; --dim:#4C4F47;
+    --err:#FF5470; --cyan:#22D3EE; --amber:#FFB020;
+    --mono:'JetBrains Mono',monospace; --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--white); font-family:var(--body);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    background-image:linear-gradient(rgba(170,255,0,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(170,255,0,.022) 1px,transparent 1px);
+    background-size:56px 56px;
+  }
+  a{color:var(--acid);text-decoration:none} a:hover{text-decoration:underline}
+  .muted{color:var(--muted)} .ok{color:var(--acid)} .err{color:var(--err)}
+  .wrap{max-width:1220px;margin:0 auto;padding:26px 26px 64px}
+
+  /* header */
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    border-bottom:1px solid var(--line);padding-bottom:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:16px}
+  .brand img.seal{width:44px;height:auto;filter:drop-shadow(0 0 0 transparent);transition:filter .5s ease}
+  .brand.lit img.seal{filter:drop-shadow(0 0 18px rgba(170,255,0,.9))}
+  .brand img.word{height:22px;width:auto;opacity:.96}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-top:6px}
+  .net{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill{font-family:var(--mono);font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--muted);display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:background .3s}
+  .pill.ok{color:var(--white)} .pill.ok .dot{background:var(--acid)}
+  .pill.warn{color:var(--err)} .pill.warn .dot{background:var(--err)}
+  .pill.live{color:var(--acid);border-color:var(--acid)} .pill.live .dot{background:var(--acid);box-shadow:0 0 8px var(--acid)}
+  .pill.sim .dot{background:var(--cyan)}
+
+  button{font-family:var(--mono);font-size:12.5px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    border:1px solid var(--acid);background:transparent;color:var(--acid);padding:10px 16px;border-radius:8px;
+    transition:background .15s,color .15s,opacity .15s,box-shadow .15s}
+  button:hover:not(:disabled){background:var(--acid);color:#0A0B09}
+  button:disabled{opacity:.3;cursor:not-allowed;border-color:var(--dim);color:var(--dim)}
+  button.solid{background:var(--acid);color:#0A0B09;border-color:var(--acid)}
+  button.solid:hover:not(:disabled){filter:brightness(1.08);box-shadow:0 0 22px rgba(170,255,0,.45)}
+  button.ghost{border-color:var(--line);color:var(--muted)}
+  button.ghost:hover:not(:disabled){background:var(--panel);color:var(--white);border-color:var(--acid-dim)}
+  button.danger{border-color:rgba(255,84,112,.5);color:var(--err)}
+  button.danger:hover:not(:disabled){background:var(--err);color:#0A0B09}
+  button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .run{display:flex;align-items:center;gap:8px}
+
+  /* lede */
+  .lede{margin:34px 0 26px;max-width:760px}
+  .lede h1{font-family:var(--disp);font-weight:700;font-size:clamp(32px,4.6vw,56px);line-height:1.03;letter-spacing:-1.4px;margin:0 0 14px}
+  .lede h1 .x{color:var(--acid)}
+  .lede p{color:var(--muted);font-size:16.5px;margin:0}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .panel + .panel{margin-top:20px}
+  .panel h2{font-family:var(--mono);font-size:11.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--acid);margin:0 0 3px;display:flex;align-items:center;gap:9px}
+  .panel .sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+  .sectlabel{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin:18px 0 9px}
+
+  /* record steps */
+  .step{border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;margin-bottom:9px;background:var(--panel-2)}
+  .step .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;color:var(--acid);text-transform:uppercase;margin-bottom:8px}
+  .fields{display:flex;flex-wrap:wrap;gap:8px}
+  .field{display:flex;flex-direction:column;gap:3px}
+  .field label{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+  .field input{font-family:var(--mono);font-size:12px;background:var(--panel-3);border:1px solid var(--line-2);color:var(--white);
+    border-radius:6px;padding:6px 8px;min-width:74px}
+  .field input:focus{outline:none;border-color:var(--acid)}
+
+  .rootprev{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .rootprev .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;display:flex;justify-content:space-between}
+  .rootprev .val{font-family:var(--mono);font-size:12.5px;color:var(--cyan);word-break:break-all;margin-top:7px;line-height:1.55}
+  .rootprev.flash .val{color:var(--white)}
+
+  /* operator controls */
+  .ctl{margin-top:6px}
+  .ctlrow{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  .num{display:flex;flex-direction:column;gap:5px}
+  .num label{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+  .num input[type=text],.num input[type=number]{font-family:var(--mono);font-size:14px;background:var(--panel-3);border:1px solid var(--line);
+    color:var(--white);border-radius:7px;padding:9px 11px;width:120px}
+  .num input:focus{outline:none;border-color:var(--acid)}
+  .sliderwrap{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px}
+  .sliderwrap .top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+  .sliderwrap .top b{color:var(--acid);font-weight:600}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:99px;background:linear-gradient(90deg,var(--acid) 0%,var(--acid) 30%,#20241a 30%);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--acid);cursor:pointer;box-shadow:0 0 10px rgba(170,255,0,.5)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--acid);cursor:pointer}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+  /* public | private split */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .col{padding:16px 16px 18px}
+  .col.pub{background:var(--panel-2);border-right:1px solid var(--line)}
+  .col.priv{background:linear-gradient(180deg,rgba(34,211,238,.03),transparent)}
+  .col .ch{font-family:var(--mono);font-size:10px;letter-spacing:1.8px;text-transform:uppercase;display:flex;align-items:center;gap:7px;margin-bottom:12px}
+  .col.pub .ch{color:var(--acid)} .col.priv .ch{color:var(--cyan)}
+  .kv{margin-bottom:11px}
+  .kv .k{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+  .kv .v{font-family:var(--mono);font-size:12.5px;color:var(--white);word-break:break-all;line-height:1.5}
+  .handle{font-family:var(--mono);font-size:11.5px;color:var(--cyan);word-break:break-all;line-height:1.55}
+  .clear{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--acid);letter-spacing:-.5px;line-height:1}
+  .clear.sealed{font-family:var(--mono);font-weight:400;font-size:20px;color:var(--dim);letter-spacing:2px}
+  .meter{display:flex;gap:3px;margin:10px 0 4px}
+  .meter i{flex:1;height:7px;border-radius:2px;background:#1b1f16;transition:background .3s,box-shadow .3s}
+  .meter i.on{background:var(--cyan);box-shadow:0 0 7px rgba(34,211,238,.5)}
+  .meter.pulse i{animation:mpulse .5s ease}
+  @keyframes mpulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .revealbtn{margin-top:10px}
+
+  /* ledger + beats */
+  .ledger{border:1px solid var(--line-2);border-radius:10px;overflow:hidden;margin-bottom:16px}
+  .ledger .lrow{display:grid;grid-template-columns:44px 1fr 150px 96px;gap:10px;align-items:center;
+    padding:10px 13px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:11.5px}
+  .ledger .lrow:last-child{border-bottom:none}
+  .ledger .lrow.head{color:var(--dim);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;background:var(--panel-2)}
+  .ledger .seq{color:var(--muted)} .ledger .rt{color:var(--cyan);word-break:break-all}
+  .ledger .vd .within{color:var(--acid)} .ledger .vd .over{color:var(--amber)} .ledger .vd .sealed{color:var(--dim)}
+  .ledger .empty{padding:16px 13px;color:var(--dim);font-family:var(--mono);font-size:11.5px}
+
+  .beats{display:flex;align-items:center;gap:0;margin:6px 2px 18px}
+  .beats .beat{width:11px;height:11px;border-radius:50%;background:var(--dim);flex:none;transition:background .3s,box-shadow .3s}
+  .beats .beat.on{background:var(--acid);box-shadow:0 0 12px rgba(170,255,0,.8)}
+  .beats .seg{flex:1;height:1px;background:var(--line-2)}
+  .beats .seg.on{background:var(--acid-dim)}
+  .beatlbl{font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+
+  .console{background:#070806;border:1px solid var(--line);border-radius:10px;padding:13px;min-height:120px;max-height:220px;overflow:auto;
+    font-family:var(--mono);font-size:12px;line-height:1.65}
+  .console .ln{color:var(--muted);word-break:break-all}
+  .console .ln .t{color:var(--dim);margin-right:8px}
+  .console .ln.ok{color:var(--acid)} .console .ln.err{color:var(--err)} .console .ln.pending{color:var(--cyan)}
+
+  .setup{margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
+  .setup summary{font-family:var(--mono);font-size:11px;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase;cursor:pointer}
+  .setup .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .setup input{font-family:var(--mono);font-size:12px;background:var(--panel-3);border:1px solid var(--line);color:var(--white);
+    border-radius:6px;padding:9px 11px;flex:1;min-width:260px}
+  .setup input:focus{outline:none;border-color:var(--acid)}
+  .setup .note{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.6}
+  footer{margin-top:40px;font-family:var(--mono);font-size:11px;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;
+    border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media(max-width:900px){.grid,.split{grid-template-columns:1fr}.col.pub{border-right:none;border-bottom:1px solid var(--line)}
+    .ledger .lrow{grid-template-columns:34px 1fr 96px 70px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand" id="brand">
+      <img class="seal" src="data:image/png;base64,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" alt="Hero seal">
+      <div>
+        <img class="word" src="data:image/png;base64,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" alt="Hero Network">
+        <div class="eyebrow">Confidential Proof of Action</div>
+      </div>
+    </div>
+    <div class="net">
+      <span class="pill sim" id="modePill"><span class="dot"></span><span id="modeText">Simulation</span></span>
+      <span class="pill" id="netPill"><span class="dot"></span><span id="netText">Not connected</span></span>
+      <button id="connectBtn" class="ghost">Connect wallet</button>
+      <div class="run"><button id="runBtn" class="solid">▶ Run pitch</button></div>
+    </div>
+  </header>
+
+  <div class="lede">
+    <h1>A machine obeyed its rules.<br>Prove it <span class="x">without revealing the rules or the action.</span></h1>
+    <p>An autonomous agent acts under an <b>encrypted</b> authority. The contract checks <span style="color:var(--acid)">action&nbsp;≤&nbsp;authority</span> on ciphertext, anchors a public proof on Arbitrum, and only the operator can unseal the numbers. Anchoring is table stakes — the confidentiality is the moat.</p>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: operator & agent -->
+    <section class="panel">
+      <h2>Operator &amp; agent</h2>
+      <p class="sub">Grant an encrypted budget, then let the agent act. The action record is the tamper-evidence; its hash is what anchors.</p>
+
+      <div class="sectlabel">Action record — edit any field</div>
+      <div id="record"></div>
+      <div class="rootprev" id="rootPrev">
+        <div class="lbl"><span>Record hash (preview)</span><span>computed in your browser</span></div>
+        <div class="val" id="recRoot">—</div>
+      </div>
+
+      <div class="sectlabel">Grant authority</div>
+      <div class="ctlrow">
+        <div class="num"><label>Agent</label><input id="agentId" type="text" value="agent-1" spellcheck="false"></div>
+        <div class="num"><label>Encrypted limit</label><input id="limitInput" type="number" value="1000" min="1"></div>
+        <button id="grantBtn" class="ghost">Grant</button>
+      </div>
+
+      <div class="sectlabel">Agent acts</div>
+      <div class="ctlrow">
+        <div class="sliderwrap">
+          <div class="top"><span>Action amount (you know it; the chain won't)</span><b id="amountLabel">300</b></div>
+          <input id="amountSlider" type="range" min="0" max="1000" value="300" step="10" aria-label="Action amount">
+        </div>
+      </div>
+      <div class="btnrow">
+        <button id="actBtn" class="solid" disabled>Act</button>
+        <button id="overBtn" class="ghost" disabled>Over-spend</button>
+        <button id="revokeBtn" class="danger" disabled>Revoke</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: the proof -->
+    <section class="panel">
+      <h2>The proof</h2>
+      <p class="sub">Same action, two truths: a public proof anyone can verify, and an encrypted state only the operator can open.</p>
+      <div class="split">
+        <div class="col pub">
+          <div class="ch">◇ Public · verifiable</div>
+          <div class="kv"><div class="k">Anchored on Arbitrum</div><div class="v" id="pubAnchored"><span class="muted">awaiting first action</span></div></div>
+          <div class="kv"><div class="k">Proof root</div><div class="v handle" id="pubRoot">—</div></div>
+          <div class="kv"><div class="k">Record</div><div class="v" id="pubMeta"><span class="muted">—</span></div></div>
+          <div class="kv"><div class="k">Transaction</div><div class="v" id="pubLink"><span class="muted">—</span></div></div>
+          <button id="verifyBtn" class="ghost" style="margin-top:6px" disabled>Verify last proof</button>
+        </div>
+        <div class="col priv">
+          <div class="ch">🔒 Private · encrypted</div>
+          <div class="kv"><div class="k">Remaining authority (ciphertext)</div><div class="handle" id="privHandle">—</div></div>
+          <div class="meter" id="meter"></div>
+          <div class="kv" style="margin-top:12px"><div class="k">Operator view (unsealed)</div><div class="clear sealed" id="privClear">•sealed•</div></div>
+          <button id="revealBtn" class="ghost revealbtn" disabled>Reveal — operator only</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Action ledger &amp; proof timeline</h2>
+    <p class="sub">Every action anchors a public proof; the amounts and budget stay encrypted. Over-authority actions are a silent no-op — still anchored, nothing leaked.</p>
+    <div class="beatlbl"><span>Pitch timeline</span><span id="beatName">idle</span></div>
+    <div class="beats" id="beats"></div>
+    <div class="ledger" id="ledger"></div>
+    <div class="console" id="console"><div class="ln"><span class="t">›</span>Simulation ready. Press <b style="color:var(--acid)">▶ Run pitch</b>, or drive it yourself.</div></div>
+
+    <details class="setup">
+      <summary>Setup · go live</summary>
+      <div class="row">
+        <input id="caInput" placeholder="ConfidentialAuthority contract address (0x…)" spellcheck="false" aria-label="ConfidentialAuthority contract address">
+        <input id="anchorInput" placeholder="HeroProofAnchor address (optional, 0x…)" spellcheck="false" aria-label="HeroProofAnchor contract address">
+        <button id="saveSetup" class="ghost">Arm live</button>
+      </div>
+      <div class="note">Simulation needs nothing. For <b>live</b> mode: deploy the contracts (<code>make deploy-verify</code>), paste the <code>ConfidentialAuthority</code> address, connect a wallet on Arbitrum Sepolia (chain 421614). The UI then encrypts via cofhejs and drives the real contract.</div>
+    </details>
+  </section>
+
+  <footer>
+    <span>Hero · Confidential proof-of-action on Arbitrum</span>
+    <span id="footNet">Arbitrum Sepolia · 421614</span>
+  </footer>
+</div>
+
+<script>
+const CONFIG = {
+  chainIdHex: '0x66eee',            // 421614
+  chainName: 'Arbitrum Sepolia',
+  rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
+  explorer: 'https://sepolia.arbiscan.io',
+};
+
+// InEuint32 tuple + euint/ebool handles are uint256 in the ABI.
+// NOTE: confirm the tuple field order against @fhenixprotocol/cofhe-contracts@0.1.4 before trusting live mode.
+const IN_EUINT32 = '(uint256 ctHash, uint8 securityZone, uint8 utype, bytes signature)';
+const CA_ABI = [
+  'function grantAuthority(bytes32 agentId, '+IN_EUINT32+' encLimit)',
+  'function act(bytes32 agentId, '+IN_EUINT32+' encAmount, bytes32 proofRoot)',
+  'function revokeAuthority(bytes32 agentId)',
+  'function remainingAuthority(bytes32 agentId) view returns (uint256)',
+  'function wasWithinAuthority(bytes32 proofRoot) view returns (uint256)',
+  'function verifyAction(bytes32 proofRoot) view returns (bool anchored, uint64 timestamp, address submitter)',
+  'function agentInfo(bytes32 agentId) view returns (address operator, uint64 actionCount)'
+];
+
+const BEATS = ['grant','act · within','act · within','over-spend','unseal · revoke'];
+
+const state = {
+  mode:'sim',
+  record:[
+    { step:'AUTHORITY', fields:{ grant:'move_pallet', scope:'zone-A', expires:'2026-09-01' } },
+    { step:'PERCEIVE',  fields:{ sensor:'lidar', reading:'pallet @ 1.2m' } },
+    { step:'DECIDE',    fields:{ policy:'v0.3', action:'advance' } },
+    { step:'ACT',       fields:{ actuator:'drive', result:'moved 1.2m' } },
+  ],
+  granted:false, revoked:false,
+  limitClear:null, remainingClear:null,
+  ledger:[], currentActRoot:null,
+  beat:-1, running:false,
+  account:null, chainOk:false,
+  caAddress:'', anchorAddress:'',
+};
+
+let engine, provider, signer, ca;
+let cofhe=null, cofheReady=false;
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r=>setTimeout(r, reduced()? Math.min(ms,120): ms));
+const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const short = h => !h ? '—' : (h.length>18 ? h.slice(0,10)+'…'+h.slice(-6) : h);
+
+// ---------- hashing ----------
+function buildRoot(records){
+  let prev = ethers.ZeroHash;
+  for(const rec of records){
+    prev = ethers.keccak256(ethers.concat([prev, ethers.toUtf8Bytes(JSON.stringify(rec))]));
+  }
+  return prev;
+}
+function recordRoot(){ return buildRoot(state.record); }
+function actRootFor(rRoot, seq){ return ethers.keccak256(ethers.concat([rRoot, ethers.toBeHex(seq, 32)])); }
+// deterministic, non-reversible display handle — never encodes the value
+function handleFor(salt, nonce){ return ethers.keccak256(ethers.toUtf8Bytes('hero:'+salt+':'+nonce)); }
+
+// ---------- rendering ----------
+function renderRecord(){
+  const host = $('record'); host.innerHTML='';
+  state.record.forEach(rec=>{
+    const card=document.createElement('div'); card.className='step';
+    const tag=document.createElement('div'); tag.className='tag'; tag.textContent=rec.step; card.appendChild(tag);
+    const fields=document.createElement('div'); fields.className='fields';
+    Object.keys(rec.fields).forEach(key=>{
+      const f=document.createElement('div'); f.className='field';
+      const lab=document.createElement('label'); lab.textContent=key.replace(/_/g,' '); f.appendChild(lab);
+      const inp=document.createElement('input'); inp.value=rec.fields[key];
+      inp.size=Math.max(8, String(rec.fields[key]).length);
+      inp.addEventListener('input', ()=>{ rec.fields[key]=inp.value; inp.size=Math.max(8, inp.value.length); renderRootPreview(); });
+      f.appendChild(inp); fields.appendChild(f);
+    });
+    card.appendChild(fields); host.appendChild(card);
+  });
+  renderRootPreview();
+}
+function renderRootPreview(){
+  const v=$('recRoot'); v.textContent=recordRoot();
+  const box=$('rootPrev'); box.classList.add('flash'); setTimeout(()=>box.classList.remove('flash'),130);
+}
+function renderMeter(onCount){
+  const m=$('meter'); m.innerHTML='';
+  for(let i=0;i<10;i++){ const s=document.createElement('i'); if(i<onCount) s.classList.add('on'); m.appendChild(s); }
+}
+function pulseMeter(){ const m=$('meter'); m.classList.add('pulse'); setTimeout(()=>m.classList.remove('pulse'),520); }
+function fillMeter(remaining){
+  const lim=state.limitClear||remaining||1;
+  renderMeter(Math.max(0, Math.round((remaining/lim)*10)));
+}
+function renderBeats(){
+  const host=$('beats'); host.innerHTML='';
+  BEATS.forEach((b,i)=>{
+    if(i>0){ const seg=document.createElement('span'); seg.className='seg'+(i<=state.beat?' on':''); host.appendChild(seg); }
+    const dot=document.createElement('span'); dot.className='beat'+(i<=state.beat?' on':''); dot.title=b; host.appendChild(dot);
+  });
+  $('beatName').textContent = state.beat<0 ? 'idle' : (state.beat+1)+'/5 · '+BEATS[state.beat];
+}
+function setBeat(n){ state.beat=n; renderBeats(); }
+function renderLedger(){
+  const host=$('ledger'); host.innerHTML='';
+  const head=document.createElement('div'); head.className='lrow head';
+  head.innerHTML='<span>#</span><span>proof root</span><span>verdict</span><span>anchor</span>'; host.appendChild(head);
+  if(state.ledger.length===0){ const e=document.createElement('div'); e.className='empty'; e.textContent='No actions yet — encrypted budget is untouched.'; host.appendChild(e); return; }
+  state.ledger.forEach(e=>{
+    const row=document.createElement('div'); row.className='lrow';
+    const vd = e.within===true?'<span class="within">within ✓</span>': e.within===false?'<span class="over">over ⊘</span>':'<span class="sealed">🔒 sealed</span>';
+    row.innerHTML='<span class="seq">'+e.seq+'</span><span class="rt">'+short(e.root)+'</span><span class="vd">'+vd+'</span><span>'+anchorCell(e.tx)+'</span>';
+    host.appendChild(row);
+  });
+}
+function anchorCell(tx){
+  if(!tx) return '<span class="muted">—</span>';
+  if(state.mode==='live') return '<a target="_blank" rel="noopener" href="'+CONFIG.explorer+'/tx/'+tx+'">arbiscan ↗</a>';
+  return '<span class="muted">sim</span>';
+}
+function linkFor(tx){
+  if(!tx) return '<span class="muted">—</span>';
+  if(state.mode==='live') return '<a target="_blank" rel="noopener" href="'+CONFIG.explorer+'/tx/'+tx+'">'+short(tx)+' ↗</a>';
+  return '<span class="muted">sim '+short(tx)+'</span>';
+}
+function logLine(msg,cls){
+  const c=$('console'); const ln=document.createElement('div'); ln.className='ln'+(cls?' '+cls:'');
+  const t=new Date().toLocaleTimeString([], {hour12:false});
+  ln.innerHTML='<span class="t">'+t+'</span>'+msg; c.appendChild(ln); c.scrollTop=c.scrollHeight;
+}
+function litSeal(){ $('brand').classList.add('lit'); setTimeout(()=>$('brand').classList.remove('lit'),1500); }
+function updateModePill(){
+  const p=$('modePill');
+  if(state.mode==='live'){ p.className='pill live'; $('modeText').textContent='Live · on-chain'; }
+  else { p.className='pill sim'; $('modeText').textContent='Simulation'; }
+}
+function setNet(cls,text){ $('netPill').className='pill'+(cls?' '+cls:''); $('netText').textContent=text; }
+
+// ---------- motion ----------
+const HEX='0123456789abcdef';
+function scramble(len){ let s='0x'; for(let i=0;i<len;i++) s+=HEX[Math.floor(Math.random()*16)]; return s; }
+function shuffleLock(el, finalHex){
+  if(reduced()){ el.textContent=finalHex; return; }
+  const len=finalHex.length-2; let ticks=0;
+  const iv=setInterval(()=>{ ticks++; if(ticks>=12){ clearInterval(iv); el.textContent=finalHex; return; }
+    const keep=Math.floor((ticks/12)*len); el.textContent=finalHex.slice(0,2+keep)+scramble(len-keep).slice(2); }, 34);
+}
+function hashSettle(el, finalHex){ shuffleLock(el, finalHex); }
+function decryptReveal(el, clearText){
+  el.classList.remove('sealed');
+  if(reduced()){ el.textContent=clearText; return; }
+  const chars='0123456789'; let ticks=0; const total=14;
+  const iv=setInterval(()=>{ ticks++; if(ticks>=total){ clearInterval(iv); el.textContent=clearText; return; }
+    let s=''; for(let i=0;i<clearText.length;i++){ s += (i < (ticks/total)*clearText.length) ? clearText[i] : chars[Math.floor(Math.random()*10)]; }
+    el.textContent=s; }, 34);
+}
+function reMaskClear(){ const el=$('privClear'); el.classList.add('sealed'); el.textContent='•sealed•'; }
+
+// ---------- engines ----------
+const simEngine = {
+  async grant(limit){ state.remainingClear=limit; state.granted=true; state.revoked=false;
+    return { ok:true, handle: handleFor('rem',0) }; },
+  async act(amount, root){
+    const within = !state.revoked && state.granted && amount <= state.remainingClear;
+    if(within) state.remainingClear -= amount;
+    const seq = state.ledger.length;
+    state.ledger.push({ seq, within, root, amountClear:amount });
+    return { within, root, sequence:seq, anchored:true, tx: handleFor('tx',seq) };
+  },
+  async reveal(){ return { remainingClear: state.remainingClear }; },
+  async revealWithin(root){ const e=state.ledger.find(x=>x.root===root); return { within: e? e.within : null }; },
+  async revoke(){ state.revoked=true; state.remainingClear=0; return { ok:true }; },
+  async verify(root){ const e=state.ledger.find(x=>x.root===root);
+    return { anchored: !!e, timestamp: e? Math.floor(Date.now()/1000):0, submitter: e? '0x00000000000000000000000000000000000000SIM':null }; },
+};
+
+async function ensureCofhe(){
+  if(cofheReady) return;
+  cofhe = await import('https://esm.sh/cofhejs@0.3.1');
+  await cofhe.cofhejs.initializeWithEthers({ ethersProvider: provider, ethersSigner: signer, environment:'TESTNET' });
+  cofheReady=true;
+}
+function agentBytes(){ return ethers.id($('agentId').value||'agent-1'); }
+const liveEngine = {
+  async grant(limit){
+    try{ await ensureCofhe();
+      const [enc]=await cofhe.cofhejs.encrypt([cofhe.Encryptable.uint32(BigInt(limit))]);
+      await (await ca.grantAuthority(agentBytes(), enc)).wait();
+      state.granted=true; return { ok:true, handle:'(encrypted on-chain)' };
+    }catch(e){ logLine('live grant: '+(e.shortMessage||e.message),'err'); return {ok:false}; }
+  },
+  async act(amount, root){
+    try{ await ensureCofhe();
+      const [enc]=await cofhe.cofhejs.encrypt([cofhe.Encryptable.uint32(BigInt(amount))]);
+      const tx=await ca.act(agentBytes(), enc, root); await tx.wait();
+      const seq=state.ledger.length; state.ledger.push({ seq, within:null, root, amountClear:null });
+      return { within:null, root, sequence:seq, anchored:true, tx: tx.hash };
+    }catch(e){ logLine('live act: '+(e.shortMessage||e.message),'err'); return {anchored:false}; }
+  },
+  async reveal(){
+    try{ await ensureCofhe();
+      const permit=await cofhe.cofhejs.createPermit({ type:'self', issuer: state.account });
+      const h=await ca.remainingAuthority(agentBytes());
+      const clear=await cofhe.cofhejs.unseal(h, cofhe.FheTypes.Uint32, permit);
+      return { remainingClear: Number(clear) };
+    }catch(e){ logLine('live reveal: '+(e.shortMessage||e.message),'err'); return {remainingClear:null}; }
+  },
+  async revealWithin(root){
+    try{ await ensureCofhe();
+      const permit=await cofhe.cofhejs.createPermit({ type:'self', issuer: state.account });
+      const h=await ca.wasWithinAuthority(root);
+      const w=await cofhe.cofhejs.unseal(h, cofhe.FheTypes.Bool, permit);
+      return { within: Boolean(w) };
+    }catch(e){ logLine('live within: '+(e.shortMessage||e.message),'err'); return {within:null}; }
+  },
+  async revoke(){
+    try{ await (await ca.revokeAuthority(agentBytes())).wait(); state.revoked=true; return {ok:true}; }
+    catch(e){ logLine('live revoke: '+(e.shortMessage||e.message),'err'); return {ok:false}; }
+  },
+  async verify(root){
+    try{ const [anchored,timestamp,submitter]=await ca.verifyAction(root); return { anchored, timestamp:Number(timestamp), submitter }; }
+    catch(e){ logLine('live verify: '+(e.shortMessage||e.message),'err'); return {anchored:false}; }
+  },
+};
+
+function pickMode(){
+  const wantLive = ethers.isAddress(state.caAddress) && !!state.account && state.chainOk;
+  state.mode = wantLive ? 'live' : 'sim';
+  engine = wantLive ? liveEngine : simEngine;
+  if(wantLive){ try{ ca=new ethers.Contract(state.caAddress, CA_ABI, signer); }catch(e){ state.mode='sim'; engine=simEngine; } }
+  updateModePill();
+}
+
+// ---------- handlers ----------
+function refreshButtons(){
+  const g=state.granted;
+  $('actBtn').disabled=!g; $('overBtn').disabled=!g; $('revokeBtn').disabled=!g;
+  $('revealBtn').disabled=!g; $('verifyBtn').disabled=state.ledger.length===0;
+}
+async function onGrant(){
+  const limit=Number($('limitInput').value||0);
+  if(!(limit>0)){ logLine('Enter a positive limit to grant.','err'); return; }
+  state.limitClear=limit;
+  logLine(state.mode==='live'?'Encrypting limit client-side, granting on-chain…':'Granting encrypted authority — the limit never appears in the clear.','pending');
+  const r=await engine.grant(limit);
+  if(r && r.ok===false){ logLine('Grant failed.','err'); return; }
+  state.granted=true;
+  const h=(r && typeof r.handle==='string' && r.handle.startsWith('0x'))? r.handle : handleFor('rem',0);
+  shuffleLock($('privHandle'), h); renderMeter(10); reMaskClear();
+  $('amountSlider').max=String(limit);
+  logLine('Authority granted · budget encrypted. Public side is still empty — nothing has acted yet.','ok');
+  refreshButtons();
+}
+async function doAct(amount, label){
+  if(!state.granted){ logLine('Grant an authority first.','err'); return; }
+  const seq=state.ledger.length;
+  const aRoot=actRootFor(recordRoot(), seq);
+  state.currentActRoot=aRoot;
+  logLine('Agent acts · amount encrypted · anchoring proof '+short(aRoot)+'…','pending');
+  const r=await engine.act(amount, aRoot);
+  if(!r || r.anchored===false){ logLine('Action was not anchored.','err'); return; }
+  $('pubAnchored').innerHTML='<span class="ok">✓ anchored</span>';
+  hashSettle($('pubRoot'), aRoot);
+  $('pubMeta').textContent='seq '+seq+' · '+(state.mode==='live'?'Arbitrum Sepolia':'simulated');
+  $('pubLink').innerHTML=linkFor(r.tx);
+  litSeal(); reMaskClear();
+  shuffleLock($('privHandle'), handleFor('rem', seq+1)); pulseMeter();
+  addLedgerEntry(seq, ('within' in r)? r.within : null, aRoot, r.tx);
+  const within=('within' in r)? r.within : null;
+  const v = within===true?'within authority ✓': within===false?'OVER authority ⊘ — no-op on budget, still anchored, nothing leaked':'sealed 🔒 (unseal to see verdict)';
+  logLine('Anchored '+short(aRoot)+' · '+v, within===false?'pending':'ok');
+  refreshButtons();
+}
+function addLedgerEntry(seq, within, root, tx){ state.ledger[seq]={seq,within,root,tx, amountClear:null}; renderLedger(); }
+function overAmount(){ return state.mode==='sim' ? (Number(state.remainingClear)||0)+100 : (state.limitClear? state.limitClear+1 : 999999); }
+async function onReveal(){
+  if(!state.granted){ logLine('Nothing to reveal yet.','err'); return; }
+  logLine(state.mode==='live'?'Operator creates a permit and unseals remaining…':'Operator unseals remaining — only the permit holder can.','pending');
+  const r=await engine.reveal();
+  if(r.remainingClear==null){ logLine('Reveal unavailable.','err'); return; }
+  decryptReveal($('privClear'), String(r.remainingClear)); fillMeter(r.remainingClear);
+  logLine('Remaining authority = '+r.remainingClear+' — visible to the operator, still encrypted to everyone else.','ok');
+}
+async function onRevoke(){
+  if(!state.granted){ return; }
+  logLine('Revoking authority · zeroing the encrypted budget…','pending');
+  const r=await engine.revoke();
+  if(r && r.ok===false){ return; }
+  state.revoked=true; reMaskClear(); renderMeter(0);
+  shuffleLock($('privHandle'), handleFor('rev', state.ledger.length));
+  logLine('Revoked. The next action can draw down nothing.','ok');
+}
+async function onVerify(){
+  const last=state.ledger[state.ledger.length-1];
+  if(!last){ logLine('No proof to verify yet.','err'); return; }
+  const r=await engine.verify(last.root);
+  if(r.anchored) logLine('Verified on '+(state.mode==='live'?'Arbitrum':'sim')+': proof '+short(last.root)+' is anchored'+(r.submitter?(' by '+short(r.submitter)):'')+'.','ok');
+  else logLine('Proof '+short(last.root)+' is NOT anchored.','err');
+}
+
+// ---------- run pitch ----------
+function setControls(on){
+  ['grantBtn','actBtn','overBtn','revokeBtn','revealBtn','verifyBtn'].forEach(id=>{ $(id).disabled=!on; });
+  if(on) refreshButtons();
+}
+async function runPitch(){
+  if(state.running) return;
+  resetDemo(); state.running=true; $('runBtn').disabled=true; setControls(false);
+  try{
+    logLine('▶ Running the pitch — five beats.','pending');
+    setBeat(0); $('limitInput').value='1000'; await onGrant(); await sleep(1300);
+    setBeat(1); $('amountSlider').value='300'; $('amountLabel').textContent='300'; await doAct(300); await sleep(1300);
+    setBeat(2); $('amountSlider').value='400'; $('amountLabel').textContent='400'; await doAct(400); await sleep(1300);
+    setBeat(3); $('amountSlider').value=String($('amountSlider').max); $('amountLabel').textContent='500'; await doAct(500); await sleep(1400);
+    setBeat(4); await onReveal(); await sleep(1400); await onRevoke();
+    logLine('Pitch complete. The room saw proofs; only the operator saw the numbers. That gap is the moat.','ok');
+  } finally { state.running=false; $('runBtn').disabled=false; setControls(true); }
+}
+function resetDemo(){
+  Object.assign(state, { granted:false, revoked:false, limitClear:null, remainingClear:null, ledger:[], currentActRoot:null, beat:-1 });
+  $('privHandle').textContent='—'; reMaskClear(); renderMeter(0);
+  $('pubAnchored').innerHTML='<span class="muted">awaiting first action</span>';
+  $('pubRoot').textContent='—'; $('pubMeta').innerHTML='<span class="muted">—</span>'; $('pubLink').innerHTML='<span class="muted">—</span>';
+  renderLedger(); renderBeats(); refreshButtons();
+}
+
+// ---------- wallet ----------
+async function ensureNetwork(){
+  try{ await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{ chainId:CONFIG.chainIdHex }] }); }
+  catch(e){ if(e.code===4902){ await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{
+    chainId:CONFIG.chainIdHex, chainName:CONFIG.chainName, rpcUrls:[CONFIG.rpc],
+    nativeCurrency:{ name:'Ether', symbol:'ETH', decimals:18 }, blockExplorerUrls:[CONFIG.explorer] }] }); } else { throw e; } }
+}
+async function connect(){
+  if(!window.ethereum){ logLine('No wallet found — simulation still works. Install MetaMask for live mode.','pending'); return; }
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    await provider.send('eth_requestAccounts',[]);
+    await ensureNetwork();
+    signer=await provider.getSigner();
+    state.account=await signer.getAddress();
+    const net=await provider.getNetwork(); state.chainOk=Number(net.chainId)===421614;
+    if(state.chainOk) setNet('ok','Arbitrum Sepolia'); else { setNet('warn','Wrong network'); logLine('Switch to Arbitrum Sepolia for live mode.','err'); }
+    $('connectBtn').textContent=state.account.slice(0,6)+'…'+state.account.slice(-4);
+    logLine('Wallet connected: '+state.account.slice(0,6)+'…'+state.account.slice(-4),'ok');
+    pickMode();
+    if(state.mode==='live') logLine('Live mode active · ConfidentialAuthority '+short(state.caAddress),'ok');
+  }catch(e){ logLine('Connect failed: '+(e.shortMessage||e.message),'err'); }
+}
+function onSaveSetup(){
+  state.caAddress=($('caInput').value||'').trim();
+  state.anchorAddress=($('anchorInput').value||'').trim();
+  pickMode();
+  if(state.mode==='live') logLine('Live armed · ConfidentialAuthority '+short(state.caAddress),'ok');
+  else logLine('Saved. Live needs a valid contract + wallet on Arbitrum Sepolia — staying in simulation.','pending');
+}
+
+// ---------- wiring ----------
+$('amountSlider').addEventListener('input', e=>{ $('amountLabel').textContent=e.target.value; });
+$('grantBtn').addEventListener('click', onGrant);
+$('actBtn').addEventListener('click', ()=>doAct(Number($('amountSlider').value)));
+$('overBtn').addEventListener('click', ()=>doAct(overAmount()));
+$('revokeBtn').addEventListener('click', onRevoke);
+$('revealBtn').addEventListener('click', onReveal);
+$('verifyBtn').addEventListener('click', onVerify);
+$('runBtn').addEventListener('click', runPitch);
+$('connectBtn').addEventListener('click', connect);
+$('saveSetup').addEventListener('click', onSaveSetup);
+document.addEventListener('keydown', e=>{
+  if(e.code==='Escape'){ resetDemo(); logLine('Reset.','pending'); }
+});
+if(window.ethereum){
+  window.ethereum.on && window.ethereum.on('chainChanged', ()=>location.reload());
+  window.ethereum.on && window.ethereum.on('accountsChanged', ()=>location.reload());
+}
+
+// ---------- init ----------
+engine=simEngine;
+renderRecord(); renderMeter(0); renderLedger(); renderBeats(); updateModePill(); refreshButtons();
+</script>
+</body>
+</html>

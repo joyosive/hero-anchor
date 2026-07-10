@@ -1,0 +1,14 @@
+# Netlify config — the Next.js app lives in web/ (this repo is a Foundry root).
+[build]
+  base = "web"
+  command = "npm run build"
+  # Relative to `base`, so this resolves to web/.next.
+  # Must differ from `base` or the Next.js runtime errors out.
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Netlify's official Next.js runtime (SSR + App Router). Auto-installed.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
