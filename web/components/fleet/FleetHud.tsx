@@ -23,9 +23,6 @@ export function FleetHud({ view, actions }: { view: FleetView; actions: FleetAct
               Each robot proves it acted within its encrypted authority. Anchored on Arbitrum; the authority and action
               stay private.
             </div>
-            <a href="/" className="mt-1 inline-block font-mono text-[10px] uppercase tracking-wide text-muted underline">
-              ← back to single-agent proof
-            </a>
           </div>
           <span className="font-mono text-[10px] text-dim">step {view.step}</span>
         </div>

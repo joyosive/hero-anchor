@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import type { HeroView } from "@/lib/types";
 import { Btn, Pill } from "./ui";
+import { SiteNav } from "./SiteNav";
 
 export function Header({
   view,
@@ -32,12 +33,7 @@ export function Header({
         <Pill tone={view.net.account ? (view.net.chainOk ? "ok" : "warn") : "idle"} dot>
           {view.net.account ? (view.net.chainOk ? "Arbitrum Sepolia" : "Wrong network") : "Not connected"}
         </Pill>
-        <a
-          href="/fleet"
-          className="font-mono text-[11px] uppercase tracking-wide text-acid hover:underline"
-        >
-          Level 2 · Fleet →
-        </a>
+        <SiteNav current="agent" />
         <Btn variant="ghost" onClick={onConnect}>
           {acct ? `${acct.slice(0, 6)}…${acct.slice(-4)}` : "Connect wallet"}
         </Btn>

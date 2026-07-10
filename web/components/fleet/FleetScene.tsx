@@ -8,7 +8,15 @@ import { ProofBoard } from "./ProofBoard";
 import type { RobotView, FleetLedgerRow } from "@/lib/fleet/types";
 
 /** Default export so it can be dynamically imported with { ssr: false }. */
-export default function FleetScene({ robots, ledger }: { robots: RobotView[]; ledger: FleetLedgerRow[] }) {
+export default function FleetScene({
+  robots,
+  ledger,
+  showBoard = true, // stage mode hides the in-scene board — the overlay owns the ledger there
+}: {
+  robots: RobotView[];
+  ledger: FleetLedgerRow[];
+  showBoard?: boolean;
+}) {
   return (
     <Canvas shadows camera={{ position: [0, 7, 11], fov: 50 }} gl={{ alpha: true }}>
       <ambientLight intensity={0.55} />
@@ -27,7 +35,7 @@ export default function FleetScene({ robots, ledger }: { robots: RobotView[]; le
 
       <Warehouse />
 
-      <ProofBoard rows={ledger} />
+      {showBoard && <ProofBoard rows={ledger} />}
 
       {robots.map((r) => (
         <Robot3D key={r.id} agent={r} />
