@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useHero } from "@/lib/useHero";
-import { Header } from "@/components/Header";
+import { Btn, Pill } from "@/components/ui";
 import { Lede } from "@/components/Lede";
 import { OperatorPanel } from "@/components/OperatorPanel";
 import { ProofSplit } from "@/components/ProofSplit";
@@ -25,9 +25,26 @@ export default function ProofWalkthrough() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-[1220px] px-[26px] pb-16 pt-[26px]">
-      <Header view={view} onRun={actions.runPitch} />
+    <main className="mx-auto max-w-[1220px] px-[26px] pb-16 pt-8">
       <Lede />
+      {/* walkthrough controls — page content, not a second header bar */}
+      <div className="mb-5 mt-2 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
+        <div className="flex items-center gap-2.5">
+          <Pill tone={view.mode === "sim" ? "sim" : "live"} dot>
+            {view.mode === "live"
+              ? "Live · on-chain"
+              : view.mode === "local"
+                ? "Local · on-chain"
+                : "Interactive walkthrough"}
+          </Pill>
+          <span className="hidden font-mono text-[11px] uppercase tracking-[1.5px] text-dim sm:inline">
+            grant → act → prove → reveal
+          </span>
+        </div>
+        <Btn variant="solid" onClick={actions.runPitch} disabled={view.running}>
+          ▶ Run pitch
+        </Btn>
+      </div>
 
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1.05fr_1fr]">
         <OperatorPanel
