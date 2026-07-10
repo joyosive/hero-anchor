@@ -84,10 +84,10 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
             Trust infrastructure for physical AI
           </div>
           <a
-            href="/fleet"
+            href="/"
             className="pointer-events-auto mt-2 inline-block font-mono text-[10px] uppercase tracking-[1.5px] text-dim hover:text-acid"
           >
-            ← exit stage
+            ← Back to overview
           </a>
         </div>
         <div className="rounded-lg border border-line bg-[rgba(10,11,9,0.85)] px-4 py-2 text-right">
@@ -100,8 +100,9 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
         </div>
       </div>
 
-      {/* right rail — live proofs + cost + QR */}
-      <div className="absolute right-[clamp(12px,2.5vw,32px)] top-[clamp(96px,14vh,128px)] flex w-[clamp(250px,26vw,340px)] flex-col gap-3">
+      {/* right rail — live proofs + cost + QR. Hidden below md: on a phone it
+          would overlap the scene; the captions + cards carry the numbers there. */}
+      <div className="absolute right-[clamp(12px,2.5vw,32px)] top-[clamp(96px,14vh,128px)] hidden w-[clamp(250px,26vw,340px)] flex-col gap-3 md:flex">
         <div className="rounded-xl border border-line bg-[rgba(10,11,9,0.85)] p-4">
           <div className="font-mono text-[11px] uppercase tracking-[2px] text-acid">Evidence · anyone can verify</div>
           <div className="mt-2 flex flex-col gap-1.5">
@@ -189,8 +190,15 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
             <div className="mt-4 font-mono text-[clamp(12px,1.4vw,15px)] text-muted">
               The mandate never goes public. The proof never goes away.
             </div>
-            <div className="mt-6 inline-block rounded-full border border-acid px-6 py-2 font-mono text-[clamp(12px,1.4vw,15px)] font-semibold uppercase tracking-[2px] text-acid">
-              Press Space to start the shift
+            <button
+              type="button"
+              onClick={() => actions.run()}
+              className="pointer-events-auto mt-6 rounded-full bg-acid px-8 py-3.5 font-mono text-[clamp(13px,1.5vw,16px)] font-bold uppercase tracking-[1.5px] text-[#0A0B09] transition-opacity hover:opacity-90 active:opacity-80"
+            >
+              ▶ Start the shift
+            </button>
+            <div className="mt-3 font-mono text-[10px] uppercase tracking-[2px] text-dim">
+              or press Space · F for fullscreen
             </div>
           </div>
         </div>
