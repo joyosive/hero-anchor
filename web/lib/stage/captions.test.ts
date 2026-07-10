@@ -24,7 +24,7 @@ const row = (within: boolean | null, i: number): FleetLedgerRow => ({
   tx: "0xtx" + i,
 });
 
-describe("stageCaption", () => {
+describe("stageCaption — narrates in the deck's evidence vocabulary", () => {
   it("prompts to start when idle with an empty ledger", () => {
     const c = stageCaption(view(), null);
     expect(c).not.toBeNull();
@@ -32,45 +32,47 @@ describe("stageCaption", () => {
     expect(c!.text).toMatch(/SPACE/);
   });
 
-  it("announces arming when the shift starts running", () => {
+  it("frames the shift as evidence when it starts running", () => {
     const prev = view();
     const c = stageCaption(view({ running: true }), prev);
     expect(c!.tone).toBe("ok");
+    expect(c!.text).toMatch(/EVIDENCE/i);
     expect(c!.text).toMatch(/ARBITRUM/i);
   });
 
-  it("celebrates the first anchored action", () => {
+  it("celebrates the first proof", () => {
     const prev = view({ running: true });
     const next = view({ running: true, ledger: [row(true, 0)] });
     const c = stageCaption(next, prev);
     expect(c!.tone).toBe("ok");
-    expect(c!.text).toMatch(/FIRST/i);
+    expect(c!.text).toMatch(/FIRST PROOF/i);
   });
 
-  it("counts subsequent anchors", () => {
+  it("counts actions as pieces of evidence", () => {
     const prev = view({ running: true, ledger: [row(true, 0)] });
     const next = view({ running: true, ledger: [row(true, 0), row(true, 1), row(true, 2)] });
     const c = stageCaption(next, prev);
     expect(c!.tone).toBe("ok");
     expect(c!.text).toMatch(/3/);
+    expect(c!.text).toMatch(/EVIDENCE/i);
   });
 
-  it("fires the alert beat when a new row is over-authority", () => {
+  it("frames an over-mandate action as a provable violation, mandate sealed", () => {
     const prev = view({ running: true, ledger: [row(true, 0)] });
     const next = view({ running: true, ledger: [row(true, 0), row(false, 1)] });
     const c = stageCaption(next, prev);
     expect(c!.tone).toBe("alert");
-    expect(c!.text).toMatch(/AUTHORITY EXCEEDED/);
-    expect(c!.text).toMatch(/nothing leaked/i);
+    expect(c!.text).toMatch(/MANDATE EXCEEDED/);
+    expect(c!.text).toMatch(/sealed/i);
   });
 
-  it("summarizes with total cost when the shift completes", () => {
+  it("summarizes with proofs + total cost when the shift completes", () => {
     const prev = view({ running: true, step: 6, ledger: [row(true, 0), row(false, 1)] });
     const next = view({ running: false, step: 6, ledger: [row(true, 0), row(false, 1)] });
     const c = stageCaption(next, prev);
     expect(c!.tone).toBe("done");
     expect(c!.text).toMatch(/2 ACTIONS/i);
-    // total cost = 2 × measured fee × est price, sub-cent → shown in cents or $0.0x
+    expect(c!.text).toMatch(/PROOFS/i);
     expect(c!.text).toMatch(/\$/);
   });
 

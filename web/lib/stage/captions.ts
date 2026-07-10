@@ -31,27 +31,27 @@ export function stageCaption(view: FleetView, prev: FleetView | null): StageCapt
     const n = view.ledger.length;
     return {
       tone: "done",
-      text: `SHIFT COMPLETE — ${n} ACTIONS, ALL ANCHORED ON ARBITRUM · TOTAL COST ${totalCostUsd(n)}`,
+      text: `SHIFT COMPLETE — ${n} ACTIONS, ${n} PROOFS ON ARBITRUM · TOTAL COST ${totalCostUsd(n)}`,
     };
   }
 
   if (newRows.some((r) => r.within === false)) {
     return {
       tone: "alert",
-      text: "AUTHORITY EXCEEDED — action still proven · budget untouched · nothing leaked",
+      text: "MANDATE EXCEEDED — the violation is provable · the mandate stays sealed",
     };
   }
 
   if (newRows.length > 0 && prevLedger === 0) {
-    return { tone: "ok", text: "FIRST ACTION ANCHORED ON ARBITRUM — a real transaction, verify it live" };
+    return { tone: "ok", text: "FIRST PROOF ANCHORED — a real Arbitrum transaction · tap it, verify it" };
   }
 
   if (newRows.length > 0) {
-    return { tone: "ok", text: `${view.ledger.length} ACTIONS · EVERY ONE A REAL TX ON ARBITRUM` };
+    return { tone: "ok", text: `${view.ledger.length} ACTIONS · ${view.ledger.length} PIECES OF EVIDENCE ON ARBITRUM` };
   }
 
   if (view.running && prev?.running !== true) {
-    return { tone: "ok", text: "FLEET ARMED — EVERY ACTION ANCHORS ON ARBITRUM" };
+    return { tone: "ok", text: "SHIFT RUNNING — EVERY ACTION BECOMES EVIDENCE ON ARBITRUM" };
   }
 
   if (!view.running && view.ledger.length === 0 && (prev === null || prev.ledger.length > 0 || prev.running)) {

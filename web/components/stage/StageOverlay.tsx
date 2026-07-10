@@ -17,7 +17,6 @@ const short = (h: string) => (h.length > 14 ? `${h.slice(0, 8)}…${h.slice(-4)}
  */
 export function StageOverlay({ view, actions }: { view: FleetView; actions: FleetActions }) {
   const [caption, setCaption] = useState<StageCaption>({ text: "PRESS SPACE — RUN THE SHIFT", tone: "idle" });
-  const [flash, setFlash] = useState(false);
   const [qr, setQr] = useState<string | null>(null);
   const prevRef = useRef<FleetView | null>(null);
   const armedRef = useRef(false);
@@ -31,19 +30,12 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // state-driven narration. NOTE: no cleanup on the flash timer — `view`
-  // changes every animation tick, and an effect cleanup would cancel the
-  // reset before it fires, leaving the red wash stuck on permanently.
+  // state-driven narration — the caption bar carries the alert emphasis;
+  // no full-screen effects (this is evidence infrastructure, not a game).
   useEffect(() => {
     const next = stageCaption(view, prevRef.current);
     prevRef.current = view;
-    if (next) {
-      setCaption(next);
-      if (next.tone === "alert") {
-        setFlash(true);
-        window.setTimeout(() => setFlash(false), 1400);
-      }
-    }
+    if (next) setCaption(next);
   }, [view]);
 
   // QR → live contract page on Arbiscan
@@ -77,24 +69,19 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
   const anchors = view.ledger.length;
   const over = view.ledger.filter((r) => r.within === false).length;
   const done = caption.tone === "done";
+  const idle = !view.running && anchors === 0;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-50 select-none">
-      {/* over-authority flash */}
-      <div
-        className={`absolute inset-0 transition-opacity duration-700 ${flash ? "opacity-100" : "opacity-0"}`}
-        style={{ boxShadow: "inset 0 0 140px 30px rgba(255,80,60,0.55)" }}
-      />
-
-      {/* scrim while the completion card is up — the scene steps back */}
-      {done && <div className="absolute inset-0 bg-[rgba(6,7,5,0.68)]" />}
+      {/* scrim while the intro or completion card is up — the scene steps back */}
+      {(done || idle) && <div className="absolute inset-0 bg-[rgba(6,7,5,0.68)]" />}
 
       {/* top bar — brand + live badge */}
       <div className="absolute left-0 right-0 top-0 flex flex-wrap items-start justify-between gap-3 p-[clamp(16px,3vw,32px)]">
         <div>
           <div className="font-mono text-[clamp(20px,2.4vw,28px)] font-bold uppercase tracking-[6px] text-acid">HERO</div>
           <div className="mt-1 font-mono text-[clamp(10px,1.1vw,13px)] uppercase tracking-[3px] text-muted">
-            Confidential proof of action · autonomous fleet
+            Trust infrastructure for physical AI
           </div>
           <a
             href="/fleet"
@@ -116,7 +103,7 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
       {/* right rail — live proofs + cost + QR */}
       <div className="absolute right-[clamp(12px,2.5vw,32px)] top-[clamp(96px,14vh,128px)] flex w-[clamp(250px,26vw,340px)] flex-col gap-3">
         <div className="rounded-xl border border-line bg-[rgba(10,11,9,0.85)] p-4">
-          <div className="font-mono text-[11px] uppercase tracking-[2px] text-acid">Public ledger · live</div>
+          <div className="font-mono text-[11px] uppercase tracking-[2px] text-acid">Evidence · anyone can verify</div>
           <div className="mt-2 flex flex-col gap-1.5">
             {view.ledger.length === 0 ? (
               <div className="font-mono text-[13px] text-dim">awaiting first action…</div>
@@ -170,13 +157,13 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
         <div
           className={`rounded-2xl border px-[clamp(16px,3vw,32px)] py-[clamp(12px,2.4vh,24px)] text-center backdrop-blur transition-colors duration-300 ${
             caption.tone === "alert"
-              ? "border-[rgba(255,120,90,0.7)] bg-[rgba(40,10,8,0.88)]"
+              ? "border-[rgba(255,176,32,0.65)] bg-[rgba(28,20,6,0.9)]"
               : "border-line bg-[rgba(10,11,9,0.88)]"
           }`}
         >
           <div
             className={`font-mono text-[clamp(15px,2.1vw,26px)] font-bold uppercase leading-[1.35] tracking-[1.5px] ${
-              caption.tone === "alert" ? "text-[#FF7860]" : caption.tone === "idle" ? "text-muted" : "text-acid"
+              caption.tone === "alert" ? "text-amber" : caption.tone === "idle" ? "text-muted" : "text-acid"
             }`}
           >
             {caption.text}
@@ -187,19 +174,41 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
         </div>
       </div>
 
+      {/* intro card — tells the room what it's about to watch */}
+      {idle && (
+        <div className="absolute left-1/2 top-1/2 w-[min(820px,92vw)] -translate-x-1/2 -translate-y-1/2">
+          <div className="rounded-2xl border border-line bg-[rgba(10,11,9,0.96)] px-[clamp(24px,5vw,48px)] py-[clamp(24px,5vh,40px)] text-center">
+            <div className="font-mono text-[clamp(12px,1.4vw,16px)] uppercase tracking-[3px] text-muted">
+              Night shift · autonomous warehouse
+            </div>
+            <div className="mt-4 font-mono text-[clamp(17px,2.2vw,26px)] font-bold uppercase leading-[1.4] tracking-[1px] text-white">
+              Three robots, each under a <span className="text-cyan">sealed mandate</span> — zone, speed, spend.
+              <br />
+              Every action becomes <span className="text-acid">evidence on Arbitrum</span>.
+            </div>
+            <div className="mt-4 font-mono text-[clamp(12px,1.4vw,15px)] text-muted">
+              The mandate never goes public. The proof never goes away.
+            </div>
+            <div className="mt-6 inline-block rounded-full border border-acid px-6 py-2 font-mono text-[clamp(12px,1.4vw,15px)] font-semibold uppercase tracking-[2px] text-acid">
+              Press Space to start the shift
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* completion card — sits above the scrim, owns the moment */}
       {done && (
         <div className="absolute left-1/2 top-1/2 w-[min(760px,92vw)] -translate-x-1/2 -translate-y-1/2">
           <div className="rounded-2xl border border-acid bg-[rgba(10,11,9,0.96)] px-[clamp(24px,5vw,48px)] py-[clamp(24px,5vh,40px)] text-center">
             <div className="font-mono text-[clamp(12px,1.4vw,16px)] uppercase tracking-[3px] text-muted">Shift complete</div>
             <div className="mt-3 font-mono text-[clamp(28px,4.2vw,44px)] font-bold leading-none text-acid">
-              {anchors} actions anchored
+              {anchors} actions → {anchors} proofs
             </div>
             <div className="mt-3 font-mono text-[clamp(12px,1.5vw,16px)] text-muted">
-              total cost {totalCostUsd(anchors)} · every proof verifiable by anyone, forever
+              on Arbitrum · total cost {totalCostUsd(anchors)} · verification free, forever
             </div>
             <div className="mt-2 font-mono text-[clamp(11px,1.2vw,13px)] text-dim">
-              authority stayed encrypted · {over} over-authority attempt{over === 1 ? "" : "s"} contained
+              mandates stayed sealed · {over} violation{over === 1 ? "" : "s"} provable to the insurer, invisible to competitors
             </div>
           </div>
         </div>
