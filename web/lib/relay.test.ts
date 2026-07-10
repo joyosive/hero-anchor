@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { isValidRoot, TokenBucket, createRelayEngine } from "./relay";
+import { isValidRoot, TokenBucket, IpBuckets, createRelayEngine } from "./relay";
 
 describe("isValidRoot", () => {
   it("accepts a 32-byte 0x hex string", () => {
@@ -16,6 +16,23 @@ describe("TokenBucket", () => {
   it("allows capacity takes then refuses (no refill)", () => {
     const b = new TokenBucket(3, 0);
     expect([b.take(), b.take(), b.take(), b.take()]).toEqual([true, true, true, false]);
+  });
+});
+
+describe("IpBuckets — one hostile client cannot starve the stage demo", () => {
+  it("rate-limits per IP: exhausting one IP leaves another untouched", () => {
+    const b = new IpBuckets(2, 0); // 2 takes per IP, no refill
+    expect(b.take("attacker")).toBe(true);
+    expect(b.take("attacker")).toBe(true);
+    expect(b.take("attacker")).toBe(false); // attacker starved
+    expect(b.take("stage-laptop")).toBe(true); // demo unaffected
+    expect(b.take("stage-laptop")).toBe(true);
+  });
+
+  it("caps tracked IPs so the map cannot grow unbounded", () => {
+    const b = new IpBuckets(1, 0, 3); // track at most 3 IPs
+    for (let i = 0; i < 10; i++) b.take(`ip-${i}`);
+    expect(b.size).toBeLessThanOrEqual(3);
   });
 });
 

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ethers } from "ethers";
 import deployed from "@/lib/deployed.sepolia.json";
 import { ANCHOR_ABI } from "@/lib/chainEngine";
-import { isValidRoot, TokenBucket } from "@/lib/relay";
+import { isValidRoot, TokenBucket, IpBuckets } from "@/lib/relay";
 import { RPC, EXPLORER } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -15,8 +15,11 @@ import { RPC, EXPLORER } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-// burst 30 / ~30 per minute sustained — a full fleet shift is 18 anchors
-const bucket = new TokenBucket(30, 0.5);
+// Per-IP first (burst 25, ~12/min sustained — one full shift is 18 anchors),
+// so a hostile client exhausts only its own allowance, never the stage
+// demo's. A generous global bucket backstops total testnet-gas burn.
+const perIp = new IpBuckets(25, 0.2);
+const globalBucket = new TokenBucket(80, 1);
 
 let contract: ethers.Contract | null = null;
 function relayer(): ethers.Contract | null {
@@ -43,7 +46,10 @@ export async function GET() {
 export async function POST(req: Request) {
   const c = relayer();
   if (!c) return NextResponse.json({ ok: false, error: "relayer disabled" }, { status: 503 });
-  if (!bucket.take()) return NextResponse.json({ ok: false, error: "rate limited" }, { status: 429 });
+  const ip = req.headers.get("x-nf-client-connection-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
+  if (!perIp.take(ip) || !globalBucket.take()) {
+    return NextResponse.json({ ok: false, error: "rate limited" }, { status: 429 });
+  }
 
   const body = (await req.json().catch(() => ({}))) as { root?: unknown };
   if (!isValidRoot(body.root)) {

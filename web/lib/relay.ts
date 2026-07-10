@@ -39,6 +39,35 @@ export class TokenBucket {
   }
 }
 
+/**
+ * Per-IP token buckets so one hostile client can't starve everyone else
+ * (the stage demo included). Oldest entries are evicted at maxIps — a
+ * bounded map, so a scanner rotating IPs can't grow memory either.
+ */
+export class IpBuckets {
+  private buckets = new Map<string, TokenBucket>();
+  constructor(
+    private capacity: number,
+    private refillPerSec: number,
+    private maxIps = 500,
+  ) {}
+  get size(): number {
+    return this.buckets.size;
+  }
+  take(ip: string): boolean {
+    let b = this.buckets.get(ip);
+    if (!b) {
+      if (this.buckets.size >= this.maxIps) {
+        const oldest = this.buckets.keys().next().value;
+        if (oldest !== undefined) this.buckets.delete(oldest);
+      }
+      b = new TokenBucket(this.capacity, this.refillPerSec);
+      this.buckets.set(ip, b);
+    }
+    return b.take();
+  }
+}
+
 /** GET the relay route; true iff a funded server-side key is configured. */
 export async function probeRelay(): Promise<boolean> {
   try {
