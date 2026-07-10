@@ -1,194 +1,183 @@
-# Hero Proof Anchor — Arbitrum testnet prototype
+# Hero — confidential proof-of-action for autonomous agents
 
-The smallest real thing that proves the Hero thesis on-chain: a contract that
-anchors a **proof-of-action root** on Arbitrum so anyone can verify it without
-trusting the operator. No token, no admin keys.
+**An autonomous agent or robot proves it acted within its authority — anchored
+and verifiable on Arbitrum — without revealing the authority or the action.**
 
-This maps to the trust ladder:
-
-- **Level 1 (off-chain):** `offchain/anchor.mjs` turns an autonomous system's
-  action log into a tamper-evident hash chain and produces a single root.
-- **Level 3 (on-chain):** `src/HeroProofAnchor.sol` anchors that root on
-  Arbitrum. `verify()` lets anyone check it later.
-
-Everything below is the fastest path to seeing it live on Arbitrum Sepolia
-(chain id **421614**).
+Built for **Arbitrum Open House Founder House London (10–12 July 2026)** ·
+Track: **Agentic AI**.
 
 ---
 
-## Route A — fastest, zero install (about 5 minutes)
+## Live
 
-Best for "is it alive" before committing to a toolchain. Browser only.
+| Surface | Link |
+|---|---|
+| Hosted demo | https://hero-anchor.netlify.app |
+| Stage demo — full-screen, self-narrating, real anchors + QR | https://hero-anchor.netlify.app/fleet?stage=1 |
+| Robot fleet | https://hero-anchor.netlify.app/fleet |
+| `HeroProofAnchor` — verified source | https://sepolia.arbiscan.io/address/0xb3fa3222130fac54b90e37835dce4f052349571b |
+| `ConfidentialAuthority` — verified source | https://sepolia.arbiscan.io/address/0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95 |
 
-1. **Wallet + network.** Install MetaMask. Add Arbitrum Sepolia via
-   [chainlist.org/chain/421614](https://chainlist.org/chain/421614) (one click),
-   or manually:
-   - Network name: Arbitrum Sepolia
-   - RPC URL: `https://sepolia-rollup.arbitrum.io/rpc`
-   - Chain ID: `421614`
-   - Currency: ETH
-   - Explorer: `https://sepolia.arbiscan.io`
-
-2. **Get test ETH.** Use a faucet:
-   - `https://www.alchemy.com/faucets/arbitrum-sepolia` (fastest, but wants a
-     little mainnet history on your wallet)
-   - `https://faucet.quicknode.com/arbitrum/sepolia` or
-     `https://faucets.chain.link/arbitrum-sepolia` (connect wallet)
-
-3. **Deploy.** Open [remix.ethereum.org](https://remix.ethereum.org), paste
-   `src/HeroProofAnchor.sol`, compile (0.8.26), then in the Deploy tab set
-   environment to **Injected Provider - MetaMask** (confirm it shows Arbitrum
-   Sepolia) and click Deploy. Approve in MetaMask.
-
-4. **Try it.** In Remix, call `anchor` with any 32-byte value, then `verify`
-   with the same value. You'll see the timestamp and submitter come back. The
-   transaction shows up on arbiscan within a second.
-
-That's a working prototype: a proof anchored on Arbitrum, verifiable by anyone.
+Both contracts are live on **Arbitrum Sepolia (chain id 421614)** with source
+verified on Arbiscan. **18 real `ProofAnchored` events** are on-chain from a
+full robot-fleet shift (2026-07-09).
 
 ---
 
-## Route B — the real repo (Foundry)
+## Why
 
-Best once you want tests, scripted deploys, and something the team iterates on.
+Agent wallets (Coinbase, Crossmint, ERC-8004) put every limit and every action
+on a public ledger — fine for a tip bot, fatal for anything regulated or
+competitive. TEE-based "verifiable AI" asks you to trust hardware vendors
+instead. Hero does both halves at once:
 
-```bash
-# 1. install Foundry
-curl -L https://foundry.paradigm.xyz | bash && foundryup
+- **Verifiable** — a tamper-evident root of what the agent *did* is anchored on
+  Arbitrum. Anyone verifies; no operator can rewrite it.
+- **Confidential** — what the agent was *allowed* to do stays encrypted. The
+  contract proves `action ≤ authority` on ciphertext (Fhenix CoFHE) without
+  decrypting either. Math-trust, not hardware-trust.
 
-# 2. from this folder, install forge-std and build
-forge install foundry-rs/forge-std
-forge build
+Anchoring alone is cloneable in a day. The confidentiality is the moat.
 
-# 3. run the tests (all local, no network)
-forge test -vv
+---
 
-# 4. deploy to Arbitrum Sepolia
-cp .env.example .env        # then edit .env with a THROWAWAY test key
-source .env
-forge script script/Deploy.s.sol \
-  --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+## What's real vs simulated
+
+We do not over-claim. As of today:
+
+| Piece | Status |
+|---|---|
+| Anchoring on Arbitrum Sepolia (`HeroProofAnchor`) | **Real.** Every anchored fleet action is a real transaction, verifiable on Arbiscan. |
+| Both contracts deployed + source-verified on Arbiscan | **Real.** |
+| Cost numbers | **Real.** Measured from actual transaction receipts (table below). |
+| Encrypted authority enforcement (`ConfidentialAuthority`, Fhenix CoFHE) | Deployed + verified + fully unit-tested. The live encrypted round trip on testnet is **pending** (the CoFHE coprocessor is testnet-grade). |
+| Fleet per-robot budget check | **Simulated** — a local JS stand-in, labelled as such in the UI. The fleet proves *anchoring*; the encrypted check lives in the single-agent flow. |
+| TEE attestation | **Simulated** stand-in (roadmap: real hardware quotes). |
+
+---
+
+## Measured cost
+
+| Mode | Gas / action | Fee (ETH) | USD @ $3,000 ETH |
+|---|---|---|---|
+| Plain `anchor` — **measured** (real Sepolia receipts, 0.02 gwei) | 49,449 | 0.000000989 | **≈ $0.003** |
+| Merkle-epoch batching — modelled (forge bench: `anchorBatch(20)` 24,835 exec gas/anchor vs 29,597 single; the 21k intrinsic amortises across the batch) | ≈ 26k | ≈ 0.00000052 | ≈ $0.0015 |
+| Orbit AnyTrust L3 (roadmap) | — | — | → near zero |
+
+Reproduce: `make gas` (forge bench + USD table).
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph OFF["Off-chain — operator side"]
+        CYC["Robot / agent cycle<br/>perceive → decide → act"]
+        ATT["Attestation<br/>(simulated TEE stand-in today;<br/>real quotes on roadmap)"]
+        ROOT["Tamper-evident hash chain<br/>→ proof root (bytes32)"]
+        CYC --> ATT --> ROOT
+    end
+
+    subgraph SUBMIT["Submission paths"]
+        BW["Browser wallet<br/>(booth / single-agent page)"]
+        RL["POST /api/relay-anchor<br/>(server-held key,<br/>validated + rate-limited)"]
+    end
+
+    subgraph ARB["Arbitrum Sepolia · 421614"]
+        PA["HeroProofAnchor<br/>anchor · anchorBatch · verify<br/>no token · no admin · no upgrade"]
+        CA["ConfidentialAuthority (Fhenix CoFHE)<br/>FHE.lte compare · branchless FHE.select<br/>enforcement on ciphertext"]
+    end
+
+    ROOT --> BW --> PA
+    ROOT --> RL --> PA
+    OPW["Operator wallet"] -->|"grantAuthority / act<br/>(encrypted amount + root)"| CA
+    CA -->|"anchor(root)<br/>try/catch (DoS-proof)"| PA
+    PA --> SCAN["Arbiscan — anyone verifies"]
 ```
 
-The deploy prints the contract address. Put it in `.env` as `ANCHOR_ADDRESS`.
+Only proof roots and ciphertexts touch the chain. Raw action data and the
+cleartext authority never do — that is what keeps it cheap and private.
+
+Deeper reading: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (trust ladder,
+design choices) · [`docs/PITCH.md`](docs/PITCH.md) ·
+[`docs/DEMO.md`](docs/DEMO.md) (stage runbook) · [`SECURITY.md`](SECURITY.md)
+(threat model, internal review).
 
 ---
 
-## Run the end-to-end flow
-
-`offchain/anchor.mjs` builds an L1 root from a sample action log and (if env is
-set) anchors it on-chain and verifies it.
+## Quickstart
 
 ```bash
-npm install
-node offchain/anchor.mjs           # offline: just prints the root + tamper demo
-# with .env filled in (RPC_URL, PRIVATE_KEY, ANCHOR_ADDRESS):
-source .env && node offchain/anchor.mjs   # anchors + verifies on Arbitrum Sepolia
+git clone git@github.com:joyosive/hero_london_house.git && cd hero_london_house
+make install        # forge-std + CoFHE packages
+forge test          # 18/18 — contracts + gas bench, no network needed
+
+cd web && npm i
+npm test            # 42/42 vitest — engines, relayer, stage sequencer
+npm run dev         # http://localhost:3000
 ```
 
-You'll see the root change the moment any record in the log is altered. That is
-the whole point of the anchor.
-
----
-
-## What's in here
-
-- `src/HeroProofAnchor.sol` — the anchoring contract (anchor, anchorBatch, verify)
-- `test/HeroProofAnchor.t.sol` — Foundry tests
-- `script/Deploy.s.sol` — deploy script
-- `offchain/anchor.mjs` — L1 hash-chain + L3 anchor/verify demo
-- `offchain/HeroProofAnchor.abi.json` — ABI (already compiled)
-
----
-
-## When you're ready: Stylus (Rust)
-
-This prototype is Solidity because it's the fastest way to stand something up.
-The strategic V1 path is **Arbitrum Stylus**, which lets you write the same
-contract in Rust (compiled to WASM, fully interoperable with Solidity), which
-suits the team's Rust depth and is markedly cheaper for the hash-heavy work the
-real proof layer does. Start there once the shape is settled:
-`cargo stylus new`, then `cargo stylus deploy` to the same Arbitrum Sepolia RPC.
-There's also a live Stylus grant pool worth applying to once you have a demo.
-
-Keep Solidity for this throwaway prototype; move the production anchor to Stylus.
-
----
-
-*Note: Arbitrum Sepolia inherits Ethereum's Sepolia, which has a planned
-end-of-life around Q3 2026 with a successor testnet arriving alongside it.
-Nothing to do now, just track it before mainnet.*
-
----
-
-## The demo page (for Founder House)
-
-`web/index.html` is a single self-contained page (Hero-branded) that does the
-whole story live in a browser:
-
-1. Shows an autonomous system's action log (authority, perceive, decide, act),
-   fully editable.
-2. Computes the proof root in the browser as you type.
-3. **Connect wallet** (MetaMask), then **Anchor on Arbitrum** with one click.
-4. **Verify proof** reads it back. Edit any field after anchoring and verify
-   again to show the tamper-evidence: the altered proof is "not anchored."
-
-To launch it:
-
-1. Deploy `HeroProofAnchor.sol` once (Route A or B above) and copy the address.
-2. Either paste the address into the page's **Setup** box, or hardcode it in
-   `web/index.html` at `CONFIG.anchorAddress` so it's wired on load.
-3. Host the single file anywhere static: drag it into Vercel/Netlify, push to
-   GitHub Pages, or just open it locally with MetaMask installed.
-
-That's the demoable moment: a machine acts, the proof forms, it anchors on
-Arbitrum, and anyone in the room can verify it.
-
----
-
-## Verify on Arbiscan + Makefile shortcuts
-
-One Etherscan API key (from etherscan.io) now verifies on Arbiscan too, via the
-v2 API. Set `ETHERSCAN_API_KEY` in `.env`, then:
+Deploy your own (Arbitrum Sepolia, throwaway key only):
 
 ```bash
-make install        # forge-std
-make test           # run tests
-make deploy-verify  # deploy to Arbitrum Sepolia AND publish source on Arbiscan
+cp .env.example .env    # RPC_URL, PRIVATE_KEY (testnet burner), ETHERSCAN_API_KEY
+make deploy-verify      # deploy + verify on Arbiscan + auto-sync addresses into web/
 ```
 
-`deploy-verify` deploys and verifies in one pass, so the contract's source and
-the Read/Write tabs show up publicly on sepolia.arbiscan.io. To verify a
-contract you already deployed:
-
-```bash
-make verify ADDRESS=0xyourContract
-```
-
-Other shortcuts: `make build`, `make deploy` (no verify),
-`make anchor ADDRESS=0x.. ROOT=0x..`, `make help`.
-
-Verifying matters for a trust product: an unverified contract asks people to
-trust your bytecode blind. A verified one lets anyone read exactly what anchors
-their proofs.
+CI (GitHub Actions) runs `forge test`, `tsc`, `vitest` and `next build` on
+every push.
 
 ---
 
-## Handoff docs
+## Roadmap — the cost and trust curves
 
-This repo carries its own context so it can be handed over cleanly:
+The anchor is deliberately minimal (no token, no admin keys, no upgradeability).
+The next steps are about scale, cost and assurance, in order:
 
-- **`docs/ARCHITECTURE.md`** — what Hero is, the trust ladder, where this L3
-  anchor sits, and the design choices (no token, no admin keys, Stylus later).
-  Read this first.
-- **`NEXT-STEPS.md`** — what's deliberately not done yet, as explicit todos:
-  the Stylus migration, Merkle batching, security review, test and serialization
-  gaps, and the guardrails to keep.
-- **`.github/workflows/ci.yml`** — runs `forge build` and `forge test` on every
-  push and pull request, so regressions show up in CI.
+1. **Merkle-epoch batching.** One root per epoch of actions instead of one per
+   action. Already modelled from the forge bench — ≈ halves per-action gas —
+   and it makes per-action cost shrink as fleet activity grows.
+2. **Stylus (Rust) verifier.** Move the hash-heavy verification path to
+   Arbitrum Stylus (WASM). Cheaper for exactly this workload, Arbitrum-native,
+   and plays to the team's Rust depth.
+3. **Orbit AnyTrust L3 — "Hero Chain".** A dedicated AnyTrust chain for
+   fleet-scale anchoring, settling to Arbitrum. Per-action cost approaches zero
+   while the neutral settlement root remains.
+4. **Real TEE quotes.** Replace the simulated attestation stand-in with
+   hardware attestation bound into the hash chain. Attestation hardens the
+   input; enforcement stays FHE — math-trust, not hardware-trust.
 
-Framing for whoever picks this up: it's a working prototype with a complete
-deploy path, not a finished foundation. The how is in this README; the why and
-the todos are in the two docs above.
-- **`CONTRIBUTING.md`** — setup, branch/PR convention, the guardrails, and a
-  step-by-step "good first contribution: propose the Stylus version."
+$0.003/action measured today → ≈ $0.0015 batched → near zero on an L3, with the
+confidentiality layer intact at every step. Robot fleets act thousands of times
+per shift; this is the curve that makes proof-per-action economical at that
+scale — and every step of it is Arbitrum-native.
+
+---
+
+## Repository
+
+- `src/HeroProofAnchor.sol` — neutral anchor: `anchor(bytes32)`,
+  `anchorBatch(bytes32[])`, `verify(bytes32)`. No token, no admin, no
+  upgradeability.
+- `src/ConfidentialAuthority.sol` — encrypted authority per agent (Fhenix
+  CoFHE): `FHE.lte` compare + branchless `FHE.select` decrement, agents keyed
+  `keccak256(operator, agentId)`, permit-gated unseal. Composes
+  `HeroProofAnchor`.
+- `test/` — forge tests incl. gas bench (18/18)
+- `web/` — Next.js app: fleet, stage mode, single-agent flow, `/api/relay-anchor`
+- `offchain/` — hash-chain builder, gas/USD table, deploy sync
+- `docs/` — architecture, pitch, demo runbook · `SECURITY.md` — threat model +
+  internal review
+
+---
+
+## Team
+
+**Hero** — an **H.E.R. DAO** project.
+
+- **Tracey Bowen (Onallee)** — CEO
+- **Joy (joyosive)** — CTO
+
+Track: **Agentic AI** · Arbitrum Open House Founder House, London,
+10–12 July 2026.
