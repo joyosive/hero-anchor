@@ -5,16 +5,7 @@ import type { HeroView } from "@/lib/types";
 import { Btn, Pill } from "./ui";
 import { SiteNav } from "./SiteNav";
 
-export function Header({
-  view,
-  onConnect,
-  onRun,
-}: {
-  view: HeroView;
-  onConnect: () => void;
-  onRun: () => void;
-}) {
-  const acct = view.net.account;
+export function Header({ view, onRun }: { view: HeroView; onRun: () => void }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
       <div className="flex items-center gap-4">
@@ -22,21 +13,19 @@ export function Header({
         <div>
           <img src="/word.png" alt="Hero Network" className="h-[22px] w-auto opacity-95" />
           <div className="mt-1.5 font-mono text-[11px] uppercase tracking-[2.5px] text-muted">
-            Confidential Proof of Action
+            How the proof works
           </div>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2.5">
         <Pill tone={view.mode === "sim" ? "sim" : "live"} dot>
-          {view.mode === "live" ? "Live · on-chain" : view.mode === "local" ? "Local · on-chain" : "Simulation"}
+          {view.mode === "live"
+            ? "Live · on-chain"
+            : view.mode === "local"
+              ? "Local · on-chain"
+              : "Interactive walkthrough"}
         </Pill>
-        <Pill tone={view.net.account ? (view.net.chainOk ? "ok" : "warn") : "idle"} dot>
-          {view.net.account ? (view.net.chainOk ? "Arbitrum Sepolia" : "Wrong network") : "Not connected"}
-        </Pill>
-        <SiteNav current="agent" />
-        <Btn variant="ghost" onClick={onConnect}>
-          {acct ? `${acct.slice(0, 6)}…${acct.slice(-4)}` : "Connect wallet"}
-        </Btn>
+        <SiteNav current="proof" />
         <Btn variant="solid" onClick={onRun} disabled={view.running}>
           ▶ Run pitch
         </Btn>
