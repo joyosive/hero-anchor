@@ -38,6 +38,27 @@ export function FleetHud({ view, actions }: { view: FleetView; actions: FleetAct
           <Btn variant="ghost" onClick={actions.reset}>Reset</Btn>
         </div>
 
+        {/* current status — always visible near the top, so it isn't buried in
+            the console at the bottom of the scrolling panel */}
+        {view.log.length > 0 &&
+          (() => {
+            const last = view.log[view.log.length - 1];
+            const cls =
+              last.cls === "ok"
+                ? "text-acid"
+                : last.cls === "err"
+                  ? "text-err"
+                  : last.cls === "pending"
+                    ? "text-cyan"
+                    : "text-white";
+            return (
+              <div className="rounded-lg border border-line2 bg-panel2 px-2.5 py-2 font-mono text-[10.5px] leading-[1.5]">
+                <span className="mr-1.5 uppercase tracking-wide text-dim">status</span>
+                <span className={cls}>{last.msg}</span>
+              </div>
+            );
+          })()}
+
         {/* on-chain toggle */}
         <label className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-muted">
           <input

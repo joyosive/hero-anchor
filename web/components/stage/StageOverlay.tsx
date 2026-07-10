@@ -218,6 +218,16 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
             <div className="mt-2 font-mono text-[clamp(11px,1.2vw,13px)] text-dim">
               mandates stayed sealed · {over} violation{over === 1 ? "" : "s"} provable to the insurer, invisible to competitors
             </div>
+            {(deployed as { anchor?: string | null }).anchor && (
+              <a
+                href={`${EXPLORER}/address/${(deployed as { anchor?: string | null }).anchor}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pointer-events-auto mt-6 inline-block rounded-full border border-acid px-6 py-2.5 font-mono text-[clamp(11px,1.3vw,14px)] font-semibold uppercase tracking-[1.5px] text-acid transition-colors hover:bg-acid hover:text-[#0A0B09]"
+              >
+                View all proofs on Arbiscan ↗
+              </a>
+            )}
           </div>
         </div>
       )}
