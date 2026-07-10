@@ -33,9 +33,11 @@ describe("resolveSepoliaConfig", () => {
 });
 
 describe("deployedCaAddress", () => {
-  it("returns '' until a valid ConfidentialAuthority address is deployed", () => {
-    // deployed.sepolia.json ships `ca: null`, so the single-agent page stays in
-    // simulation (empty caAddress) until the real deploy fills it in.
-    expect(deployedCaAddress()).toBe("");
+  it("returns the deployed, checksummed ConfidentialAuthority address", () => {
+    // deployed.sepolia.json now carries the live Arbitrum Sepolia deployment
+    // (synced by offchain/sync-deployment.mjs); a malformed/absent value must
+    // yield "" so the single-agent page falls back to simulation.
+    const addr = deployedCaAddress();
+    expect(addr).toBe("0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95");
   });
 });
