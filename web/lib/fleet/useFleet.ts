@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import type { Contract } from "ethers";
 import { createSimEngine } from "../simEngine";
 import { createChainEngine } from "../chainEngine";
+import { createRelayEngine, probeRelay } from "../relay";
 import { makeLocalContract } from "../localChain";
 import { makeSepoliaContract } from "../sepoliaChain";
+import { EXPLORER } from "../constants";
 import type { Engine } from "../types";
 import { handleFor } from "../hash";
 import { FLEET, createWorld, tick, type World } from "./world";
@@ -19,14 +21,20 @@ const reduced = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const homeById = new Map(FLEET.map((s) => [s.id, s.home] as const));
 
-// Resolve the on-chain anchor target for the fleet. Prefer a funded Sepolia
-// burner (public testnet — anchors are verifiable on Arbiscan) when one is
-// configured; otherwise fall back to local anvil. null → stay in simulation.
-function resolveFleetChain(): { contract: Contract; label: string; explorer: string | null } | null {
+// The armed on-chain target. Resolved once (async) when the toggle is armed,
+// then reused by ensureEngines/reset so the mode survives shift resets.
+type FleetChain =
+  | { kind: "burner" | "anvil"; contract: Contract; label: string; explorer: string | null }
+  | { kind: "relay"; label: string; explorer: string };
+
+// Resolution order: local booth burner (real Sepolia, key on this machine) →
+// hosted relayer (real Sepolia, key server-side) → local anvil → null = sim.
+async function resolveFleetChain(): Promise<FleetChain | null> {
   const sep = makeSepoliaContract();
-  if (sep) return { contract: sep.contract, label: sep.label, explorer: sep.explorer };
+  if (sep) return { kind: "burner", contract: sep.contract, label: sep.label, explorer: sep.explorer };
+  if (await probeRelay()) return { kind: "relay", label: "Arbitrum Sepolia · relayer", explorer: EXPLORER };
   const local = makeLocalContract();
-  if (local) return { contract: local, label: "local anvil", explorer: null };
+  if (local) return { kind: "anvil", contract: local, label: "local anvil", explorer: null };
   return null;
 }
 
@@ -84,13 +92,20 @@ export function useFleet() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const busyRef = useRef(false); // guards against overlapping sends on the shared anvil wallet
 
+  const chainRef = useRef<FleetChain | null>(null); // armed target, set by setOnChain
+
   function ensureEngines() {
     if (initedRef.current) return;
-    const chain = ref.current.onChain ? resolveFleetChain() : null;
+    const chain = ref.current.onChain ? chainRef.current : null;
     for (const s of FLEET) {
-      // on-chain: a chainEngine per robot, all sharing one wallet/contract; the
-      // shared wallet sends anchors sequentially (see stepOnce), so it's nonce-safe.
-      const e = chain ? createChainEngine({ contract: chain.contract, log }) : createSimEngine();
+      // on-chain: an engine per robot, all sharing one wallet (burner/anvil) or
+      // the relay endpoint; anchors are sent sequentially (see stepOnce), so a
+      // single shared signer is nonce-safe.
+      const e = !chain
+        ? createSimEngine()
+        : chain.kind === "relay"
+          ? createRelayEngine({ log })
+          : createChainEngine({ contract: chain.contract, log });
       void e.grant(s.id, s.budget); // grant sets the local budget closure synchronously
       enginesRef.current.set(s.id, e);
     }
@@ -219,12 +234,13 @@ export function useFleet() {
     });
   }
 
-  function setOnChain(v: boolean) {
-    const chain = v ? resolveFleetChain() : null;
+  async function setOnChain(v: boolean) {
+    const chain = v ? await resolveFleetChain() : null;
+    chainRef.current = chain;
     if (v && !chain) {
       setView({ onChain: false });
       log(
-        "No on-chain target — set a funded NEXT_PUBLIC_FLEET_BURNER_KEY (Sepolia) or run `anvil` + `make deploy-local`. Staying in sim.",
+        "No on-chain target — relayer offline and no local burner/anvil. Staying in sim.",
         "err",
       );
       return;
