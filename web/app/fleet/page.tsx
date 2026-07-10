@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useFleet } from "@/lib/fleet/useFleet";
@@ -14,6 +14,21 @@ function Fleet() {
   const { view, actions } = useFleet();
   // ?stage=1 → full-screen presentation mode (self-narrating, presenter keys)
   const stage = useSearchParams().get("stage") === "1";
+
+  // Operator Console opens REAL on-chain (relayer) by default, so no surface
+  // ever greets a visitor with "simulation". Stage mode arms itself in
+  // StageOverlay. If the relayer is unreachable, setOnChain falls back to a
+  // clearly-labeled simulation rather than a blank screen.
+  const armedRef = useRef(false);
+  useEffect(() => {
+    if (!stage && !armedRef.current) {
+      armedRef.current = true;
+      void actions.setOnChain(true);
+    }
+    // actions is stable for the component's life; arm once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
   return (
     // flex-1 min-h-0: as the flex child of the layout column, the scene fills
     // the height left by the header (full viewport in stage mode, where the
