@@ -30,9 +30,14 @@ export function SiteHeader() {
         </Link>
         <div className="flex flex-wrap items-center gap-3">
           <SiteNav current={current} />
-          <span className="hidden items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[1.5px] text-acid lg:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-acid" /> Live on Arbitrum
-          </span>
+          <a
+            href="https://sepolia.arbiscan.io/address/0xb3fa3222130fac54b90e37835dce4f052349571b"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[1.5px] text-acid transition-colors hover:border-acid lg:flex"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-acid" /> Live · Arbitrum Sepolia
+          </a>
         </div>
       </div>
     </header>
