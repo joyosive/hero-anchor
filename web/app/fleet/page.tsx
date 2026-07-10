@@ -15,9 +15,10 @@ function Fleet() {
   // ?stage=1 → full-screen presentation mode (self-narrating, presenter keys)
   const stage = useSearchParams().get("stage") === "1";
   return (
-    // h-full: the root layout owns the viewport (header + flex-1 content),
-    // so the scene fills whatever height remains — full screen in stage mode.
-    <main className="relative h-full w-full overflow-hidden bg-bg">
+    // flex-1 min-h-0: as the flex child of the layout column, the scene fills
+    // the height left by the header (full viewport in stage mode, where the
+    // header renders nothing). Avoids the 0-height percentage-chain trap.
+    <main className="relative min-h-0 w-full flex-1 overflow-hidden bg-bg">
       {/* isolate: the 3D scene's floating labels use very high z-indexes —
           containing them here keeps every overlay above the scene */}
       <div className="absolute inset-0 isolate z-0">

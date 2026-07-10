@@ -17,7 +17,7 @@ export function SiteHeader() {
   const current: SiteTab = pathname === "/fleet" ? "fleet" : pathname === "/proof" ? "proof" : "home";
 
   return (
-    <header className="border-b border-line bg-bg">
+    <header className="sticky top-0 z-30 border-b border-line bg-[rgba(10,11,9,0.92)] backdrop-blur">
       <div className="mx-auto flex max-w-[1220px] flex-wrap items-center justify-between gap-4 px-[26px] py-4">
         <Link href="/" className="flex items-center gap-4">
           <img src="/seal.png" alt="Hero seal" className="h-10 w-auto" />

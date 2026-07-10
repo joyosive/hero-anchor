@@ -38,12 +38,17 @@ body {
   background-size: 56px 56px;
 }
 
-a {
-  color: var(--color-acid);
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
+/* In @layer base so Tailwind text-* utilities (e.g. a green CTA that needs
+   dark text) can override the default link colour. An unlayered `a {}` rule
+   would beat every utility regardless of specificity. */
+@layer base {
+  a {
+    color: var(--color-acid);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
 /* range slider — themed to identity */

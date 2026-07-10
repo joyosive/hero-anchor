@@ -34,11 +34,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${disp.variable} ${mono.variable} ${body.variable}`}>
       <body>
+        {/* One flex column: sticky header + the page as the flex child.
+            Fleet/stage claims the remaining height via flex-1 (no percentage
+            chain); scrolling pages grow past the viewport normally. */}
         <div className="flex min-h-dvh flex-col">
           <Suspense fallback={null}>
             <SiteHeader />
           </Suspense>
-          <div className="min-h-0 flex-1">{children}</div>
+          {children}
         </div>
       </body>
     </html>
