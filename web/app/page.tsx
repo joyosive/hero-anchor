@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { SiteNav } from "@/components/SiteNav";
 
 // The front door tells the CEO-deck story, in the deck's own words.
 // The demos live behind the three doors at the top and bottom.
+// (Site chrome — logo, tabs, live badge — comes from SiteHeader in the layout.)
 
 const PROBLEMS = [
   {
@@ -33,26 +32,7 @@ const CA_URL = "https://sepolia.arbiscan.io/address/0x977b112bc9d121c8f2567c8a52
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-[1220px] px-[26px] pb-16 pt-[26px]">
-      {/* top bar */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
-        <div className="flex items-center gap-4">
-          <img src="/seal.png" alt="Hero seal" className="h-11 w-auto" />
-          <div>
-            <img src="/word.png" alt="Hero Network" className="h-[22px] w-auto opacity-95" />
-            <div className="mt-1.5 font-mono text-[11px] uppercase tracking-[2.5px] text-muted">
-              Trust infrastructure for physical AI
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <SiteNav current="home" />
-          <span className="hidden items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[1.5px] text-acid sm:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-acid" /> Live on Arbitrum
-          </span>
-        </div>
-      </header>
-
+    <main className="mx-auto max-w-[1220px] px-[26px] pb-16">
       {/* hero */}
       <section className="py-[clamp(40px,7vh,72px)]">
         <div className="font-mono text-[12px] uppercase tracking-[3px] text-acid">The problem</div>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
+import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 const disp = Space_Grotesk({
@@ -31,7 +33,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${disp.variable} ${mono.variable} ${body.variable}`}>
-      <body>{children}</body>
+      <body>
+        <div className="flex min-h-dvh flex-col">
+          <Suspense fallback={null}>
+            <SiteHeader />
+          </Suspense>
+          <div className="min-h-0 flex-1">{children}</div>
+        </div>
+      </body>
     </html>
   );
 }

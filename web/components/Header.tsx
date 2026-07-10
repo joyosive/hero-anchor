@@ -1,21 +1,19 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import type { HeroView } from "@/lib/types";
 import { Btn, Pill } from "./ui";
-import { SiteNav } from "./SiteNav";
 
+// Page toolbar for the /proof walkthrough. Site chrome (logo, tabs, live
+// badge) comes from SiteHeader in the root layout — this only carries the
+// walkthrough's own status + action.
 export function Header({ view, onRun }: { view: HeroView; onRun: () => void }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
-      <div className="flex items-center gap-4">
-        <img src="/seal.png" alt="Hero seal" className="h-11 w-auto" />
-        <div>
-          <img src="/word.png" alt="Hero Network" className="h-[22px] w-auto opacity-95" />
-          <div className="mt-1.5 font-mono text-[11px] uppercase tracking-[2.5px] text-muted">
-            How the proof works
-          </div>
-        </div>
+      <div>
+        <h1 className="font-mono text-[13px] uppercase tracking-[2.6px] text-acid">How the proof works</h1>
+        <p className="mt-1 text-[13px] text-muted">
+          The full grant → act → prove → reveal cycle, step by step.
+        </p>
       </div>
       <div className="flex flex-wrap items-center gap-2.5">
         <Pill tone={view.mode === "sim" ? "sim" : "live"} dot>
@@ -25,7 +23,6 @@ export function Header({ view, onRun }: { view: HeroView; onRun: () => void }) {
               ? "Local · on-chain"
               : "Interactive walkthrough"}
         </Pill>
-        <SiteNav current="proof" />
         <Btn variant="solid" onClick={onRun} disabled={view.running}>
           ▶ Run pitch
         </Btn>
