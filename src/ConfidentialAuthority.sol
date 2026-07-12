@@ -2,7 +2,7 @@
 pragma solidity ^0.8.25;
 
 import {FHE, euint32, ebool, InEuint32} from "@fhenixprotocol/cofhe-contracts/FHE.sol";
-import {HeroProofAnchor} from "./HeroProofAnchor.sol";
+import {IHeroProofAnchor} from "./IHeroProofAnchor.sol";
 
 /// @title ConfidentialAuthority
 /// @notice Hero L3+ : enforce an autonomous agent's authority on ENCRYPTED data and
@@ -24,7 +24,7 @@ import {HeroProofAnchor} from "./HeroProofAnchor.sol";
 ///         agent key (machine acts on the operator's behalf) is a natural next step.
 contract ConfidentialAuthority {
     /// @notice The neutral, public anchor this contract records proofs through.
-    HeroProofAnchor public immutable anchor;
+    IHeroProofAnchor public immutable anchor;
 
     struct Agent {
         address operator;   // who granted the authority (0 == unregistered)
@@ -42,7 +42,7 @@ contract ConfidentialAuthority {
     error AgentExists(bytes32 agentId);
     error AgentUnknown(bytes32 agentId);
 
-    constructor(HeroProofAnchor anchor_) {
+    constructor(IHeroProofAnchor anchor_) {
         anchor = anchor_;
     }
 

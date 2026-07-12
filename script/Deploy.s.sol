@@ -2,21 +2,28 @@
 pragma solidity ^0.8.25;
 
 import "forge-std/Script.sol";
-import "../src/HeroProofAnchor.sol";
-import "../src/ConfidentialAuthority.sol";
+import {IHeroProofAnchor} from "../src/IHeroProofAnchor.sol";
+import {HeroProofAnchor} from "../src/HeroProofAnchor.sol";
+import {ConfidentialAuthority} from "../src/ConfidentialAuthority.sol";
 
-/// @notice Deploys the Hero V1 stack to Arbitrum Sepolia:
-///         HeroProofAnchor (L3 neutral anchor) + ConfidentialAuthority (L3+ CoFHE moat).
+/// @notice Deploys ConfidentialAuthority (Solidity, Fhenix CoFHE) against the
+///         neutral anchor. The production anchor is the Rust/Stylus contract,
+///         deployed separately with `cargo stylus deploy`: pass its address in
+///         ANCHOR_ADDRESS. If ANCHOR_ADDRESS is unset (local anvil, where the
+///         Stylus runtime is unavailable), the Solidity reference anchor is
+///         deployed first so the stack still runs end to end.
 contract Deploy is Script {
     function run() external {
+        address anchorAddr = vm.envOr("ANCHOR_ADDRESS", address(0));
+
         vm.startBroadcast();
-
-        HeroProofAnchor anchor = new HeroProofAnchor();
-        ConfidentialAuthority ca = new ConfidentialAuthority(anchor);
-
+        if (anchorAddr == address(0)) {
+            anchorAddr = address(new HeroProofAnchor());
+        }
+        ConfidentialAuthority ca = new ConfidentialAuthority(IHeroProofAnchor(anchorAddr));
         vm.stopBroadcast();
 
-        console.log("HeroProofAnchor       deployed at:", address(anchor));
+        console.log("anchor (Rust/Stylus on Sepolia, or local reference):", anchorAddr);
         console.log("ConfidentialAuthority deployed at:", address(ca));
     }
 }
