@@ -174,8 +174,7 @@ the production anchor above.
 
 ## Team
 
-**Hero** - an **H.E.R. DAO** project.
-
+**Hero** - 
 - **Tracey Bowen** - founder. AI ethics and data research (Mozilla, Research
   England). Built H.E.R. DAO: 2,000+ builders, 20+ hubs. Creator of a global
   multi-agentic AI program for developers.
@@ -183,5 +182,3 @@ the production anchor above.
   DID). Professor, George Brown College.
 - **April Walker** - compliance and audit. Led QA and regulatory compliance for
   Uber London operations; audits across Transport for London.
-
-Track: **Agentic AI** · Arbitrum Open House Founder House, London, 10-12 July 2026.
