@@ -1,6 +1,6 @@
 {
-  "anchor": "0xb3fa3222130fac54b90e37835dce4f052349571b",
-  "ca": "0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95",
+  "anchor": "0x75B1E01222bC1bEFfd023A71762fec796FeE181A",
+  "ca": "0x28C695859bfAc9bEBe6126AAE619E83e652a1309",
   "chainId": 421614,
   "rpc": "https://sepolia-rollup.arbitrum.io/rpc"
 }

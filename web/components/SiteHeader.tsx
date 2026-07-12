@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-const ARBISCAN = "https://sepolia.arbiscan.io/address/0xb3fa3222130fac54b90e37835dce4f052349571b";
+const ARBISCAN = "https://sepolia.arbiscan.io/address/0x75B1E01222bC1bEFfd023A71762fec796FeE181A";
 
 const TABS = [
   { key: "home", label: "Why Hero", href: "/" },

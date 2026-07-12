@@ -15,8 +15,8 @@ Track: **Agentic AI**.
 | Hosted demo | https://hero-anchor.netlify.app |
 | Stage demo - full-screen, self-narrating, real anchors + QR | https://hero-anchor.netlify.app/fleet?stage=1 |
 | Robot fleet | https://hero-anchor.netlify.app/fleet |
-| `HeroProofAnchor` - verified source | https://sepolia.arbiscan.io/address/0xb3fa3222130fac54b90e37835dce4f052349571b |
-| `ConfidentialAuthority` - verified source | https://sepolia.arbiscan.io/address/0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95 |
+| `HeroProofAnchor` - verified source | https://sepolia.arbiscan.io/address/0x75B1E01222bC1bEFfd023A71762fec796FeE181A |
+| `ConfidentialAuthority` - verified source | https://sepolia.arbiscan.io/address/0x28C695859bfAc9bEBe6126AAE619E83e652a1309 |
 
 Both contracts are live on **Arbitrum Sepolia (chain id 421614)** with source
 verified on Arbiscan. **18 real `ProofAnchored` events** are on-chain from a

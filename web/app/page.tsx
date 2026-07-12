@@ -27,8 +27,8 @@ const STEPS = [
   { name: "Verify", body: "Anyone checks compliance. Mandate stays sealed" },
 ];
 
-const ANCHOR_URL = "https://sepolia.arbiscan.io/address/0xb3fa3222130fac54b90e37835dce4f052349571b";
-const CA_URL = "https://sepolia.arbiscan.io/address/0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95";
+const ANCHOR_URL = "https://sepolia.arbiscan.io/address/0x75B1E01222bC1bEFfd023A71762fec796FeE181A";
+const CA_URL = "https://sepolia.arbiscan.io/address/0x28C695859bfAc9bEBe6126AAE619E83e652a1309";
 
 export default function Home() {
   return (

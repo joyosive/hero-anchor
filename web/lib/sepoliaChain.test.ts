@@ -38,6 +38,6 @@ describe("deployedCaAddress", () => {
     // (synced by offchain/sync-deployment.mjs); a malformed/absent value must
     // yield "" so the single-agent page falls back to simulation.
     const addr = deployedCaAddress();
-    expect(addr).toBe("0x977b112bc9d121c8f2567c8a52fd7b6a4f2cdd95");
+    expect(addr).toBe("0x28C695859bfAc9bEBe6126AAE619E83e652a1309");
   });
 });
