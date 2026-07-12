@@ -5,7 +5,8 @@ import type { RecordStep } from "./types";
 // a NEW, standalone sheet, separate from every other Hero surface. Paste your
 // deployed Apps Script /exec URL here after the setup steps in the README. Left
 // empty, the page works fully and simply skips the capture POST.
-export const SHEET_ENDPOINT = "";
+export const SHEET_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbxib5Pyziz6WKfxWVKqjP6IjoHdw1Ehsmbxcb9BeNj6DTx1WXpBOlwy3ZBwS6_F-5lj/exec";
 
 // Pragmatic email shape check. Validation only: the value is contact metadata
 // and never enters a receipt, a record, or the exported JSON.
