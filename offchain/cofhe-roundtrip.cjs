@@ -29,7 +29,7 @@ const CA_ABI = [
   `function grantAuthority(bytes32 agentId, ${IN_EUINT32} encLimit)`,
   `function act(bytes32 agentId, ${IN_EUINT32} encAmount, bytes32 proofRoot)`,
   "function remainingAuthority(address operator, bytes32 agentId) view returns (uint256)",
-  "function wasWithinAuthority(bytes32 proofRoot) view returns (uint256)",
+  "function wasWithinAuthority(address operator, bytes32 agentId, bytes32 proofRoot) view returns (uint256)",
   "function agentInfo(address operator, bytes32 agentId) view returns (address op, uint64 actionCount)",
 ];
 
@@ -86,7 +86,7 @@ const main = async () => {
   console.log(`   remaining = ${remaining}`);
 
   console.log("5/5 unseal compliance flag (expect true)…");
-  const flagHandle = await contract.wasWithinAuthority(root);
+  const flagHandle = await contract.wasWithinAuthority(me, agentId, root);
   const within = unwrap("unseal flag", await cofhejs.unseal(flagHandle, FheTypes.Bool, permit.issuer, permit.getHash()));
   console.log(`   within = ${within}`);
 

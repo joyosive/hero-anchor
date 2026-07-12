@@ -18,7 +18,7 @@ export const CA_ABI: string[] = [
   `function act(bytes32 agentId, ${IN_EUINT32} encAmount, bytes32 proofRoot)`,
   "function revokeAuthority(bytes32 agentId)",
   "function remainingAuthority(address operator, bytes32 agentId) view returns (uint256)",
-  "function wasWithinAuthority(bytes32 proofRoot) view returns (uint256)",
+  "function wasWithinAuthority(address operator, bytes32 agentId, bytes32 proofRoot) view returns (uint256)",
   "function verifyAction(bytes32 proofRoot) view returns (bool anchored, uint64 timestamp, address submitter)",
   "function agentInfo(address operator, bytes32 agentId) view returns (address op, uint64 actionCount)",
 ];
@@ -48,6 +48,9 @@ export function createLiveEngine(opts: LiveOpts): Engine {
   const { contract, provider, signer, account, log } = opts;
   let cofhe: { cofhejs: any; Encryptable: any; FheTypes: any } | null = null;
   let seq = 0;
+  // wasWithinAuthority is namespaced by (operator, agentId, proofRoot), so remember
+  // which agent produced each root in order to unseal that action's flag later.
+  const rootToAgent = new Map<string, string>();
 
   async function ensure(): Promise<NonNullable<typeof cofhe>> {
     if (cofhe) return cofhe;
@@ -80,6 +83,7 @@ export function createLiveEngine(opts: LiveOpts): Engine {
 
     async act(agentId, amount, root) {
       try {
+        rootToAgent.set(root, agentId);
         const c = await ensure();
         const [enc] = await c.cofhejs.encrypt([c.Encryptable.uint32(BigInt(amount))]);
         const tx = await contract.act(agentId, enc, root);
@@ -106,9 +110,11 @@ export function createLiveEngine(opts: LiveOpts): Engine {
 
     async revealWithin(root) {
       try {
+        const agentId = rootToAgent.get(root);
+        if (!agentId) return { within: null };
         const c = await ensure();
         const permit = await c.cofhejs.createPermit({ type: "self", issuer: account });
-        const handle = await contract.wasWithinAuthority(root);
+        const handle = await contract.wasWithinAuthority(account, agentId, root);
         const w = await c.cofhejs.unseal(handle, c.FheTypes.Bool, permit);
         return { within: Boolean(unwrap(w)) };
       } catch (e) {

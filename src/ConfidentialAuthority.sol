@@ -30,6 +30,7 @@ contract ConfidentialAuthority {
         address operator;   // who granted the authority (0 == unregistered)
         euint32 remaining;  // ENCRYPTED remaining authority / budget
         uint64  actionCount;
+        bool    revoked;    // once revoked by the operator, the agent can no longer act
     }
 
     mapping(bytes32 => Agent) private _agents;          // key = _key(operator, agentId)
@@ -37,10 +38,12 @@ contract ConfidentialAuthority {
 
     event AuthorityGranted(bytes32 indexed agentId, address indexed operator);
     event AuthorityRevoked(bytes32 indexed agentId, address indexed operator);
-    event ActionAnchored(bytes32 indexed agentId, bytes32 indexed proofRoot, uint64 sequence, uint64 timestamp);
+    event ActionAnchored(bytes32 indexed agentId, address indexed operator, bytes32 indexed proofRoot, uint64 sequence, uint64 timestamp);
 
     error AgentExists(bytes32 agentId);
     error AgentUnknown(bytes32 agentId);
+    error AgentRevoked(bytes32 agentId);
+    error ProofRootReused(bytes32 proofRoot);
 
     constructor(IHeroProofAnchor anchor_) {
         anchor = anchor_;
@@ -65,7 +68,7 @@ contract ConfidentialAuthority {
         FHE.allowThis(limit);        // persist this contract's access to the ciphertext
         FHE.allowSender(limit);      // operator can decrypt/audit off-chain via permit
 
-        _agents[k] = Agent({operator: msg.sender, remaining: limit, actionCount: 0});
+        _agents[k] = Agent({operator: msg.sender, remaining: limit, actionCount: 0, revoked: false});
         emit AuthorityGranted(agentId, msg.sender);
     }
 
@@ -80,6 +83,14 @@ contract ConfidentialAuthority {
         bytes32 k = _key(msg.sender, agentId);
         Agent storage a = _agents[k];
         if (a.operator == address(0)) revert AgentUnknown(agentId);
+        if (a.revoked) revert AgentRevoked(agentId);
+
+        // Namespace the compliance flag to (operator, agentId, proofRoot). Keying
+        // it by proofRoot alone would let any other operator forge or clobber this
+        // action's attestation by reusing the public root. Reject a root already
+        // recorded for this agent so an attestation cannot be silently replaced.
+        bytes32 flagKey = keccak256(abi.encode(k, proofRoot));
+        if (ebool.unwrap(_withinAuthority[flagKey]) != 0) revert ProofRootReused(proofRoot);
 
         euint32 amount = FHE.asEuint32(encAmount);
         euint32 rem = a.remaining;
@@ -94,7 +105,7 @@ contract ConfidentialAuthority {
         FHE.allowThis(within);
         FHE.allow(within, a.operator);  // operator can audit pass/fail
         FHE.allowSender(within);        // acting operator can read its own pass/fail
-        _withinAuthority[proofRoot] = within;
+        _withinAuthority[flagKey] = within;
 
         uint64 seq = a.actionCount;
         a.actionCount = seq + 1;
@@ -104,7 +115,7 @@ contract ConfidentialAuthority {
         // revert: the confidential decrement + attestation above still stand and
         // the root is on-chain regardless. Prevents a permissionless-anchor DoS.
         try anchor.anchor(proofRoot) {} catch {}
-        emit ActionAnchored(agentId, proofRoot, seq, uint64(block.timestamp));
+        emit ActionAnchored(agentId, msg.sender, proofRoot, seq, uint64(block.timestamp));
     }
 
     /// @notice Revoke an agent's authority by zeroing its encrypted remaining. Only the
@@ -118,6 +129,7 @@ contract ConfidentialAuthority {
         FHE.allowThis(zero);
         FHE.allow(zero, a.operator);
         a.remaining = zero;
+        a.revoked = true;   // gate future act() calls, not just zero the budget
         emit AuthorityRevoked(agentId, msg.sender);
     }
 
@@ -137,9 +149,15 @@ contract ConfidentialAuthority {
         return _agents[_key(operator, agentId)].remaining;
     }
 
-    /// @notice ENCRYPTED compliance flag for an anchored action. Operator can unseal it.
-    function wasWithinAuthority(bytes32 proofRoot) external view returns (ebool) {
-        return _withinAuthority[proofRoot];
+    /// @notice ENCRYPTED compliance flag for an agent's action, namespaced to
+    ///         (operator, agentId, proofRoot). Only that operator can unseal it, and
+    ///         no other operator can forge or overwrite it.
+    function wasWithinAuthority(address operator, bytes32 agentId, bytes32 proofRoot)
+        external
+        view
+        returns (ebool)
+    {
+        return _withinAuthority[keccak256(abi.encode(_key(operator, agentId), proofRoot))];
     }
 
     /// @notice Public metadata for an agent (no secrets).

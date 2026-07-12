@@ -49,7 +49,7 @@ contract ConfidentialAuthorityTest is CofheTest {
         // remaining decremented on ciphertext, never publicly revealed
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(700));
         // encrypted compliance flag says "within authority"
-        expectPlaintext(ca.wasWithinAuthority(root), true);
+        expectPlaintext(ca.wasWithinAuthority(op.account(), AGENT, root), true);
         // public proof was anchored on Arbitrum
         (bool anchored,,) = ca.verifyAction(root);
         assertTrue(anchored);
@@ -63,7 +63,7 @@ contract ConfidentialAuthorityTest is CofheTest {
         // budget unchanged - branchless no-op, no revert, no leak
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(1000));
         // compliance flag says "outside authority"
-        expectPlaintext(ca.wasWithinAuthority(root), false);
+        expectPlaintext(ca.wasWithinAuthority(op.account(), AGENT, root), false);
         // the action is still recorded as having happened
         (bool anchored,,) = ca.verifyAction(root);
         assertTrue(anchored);
@@ -136,10 +136,60 @@ contract ConfidentialAuthorityTest is CofheTest {
         _act(300, root);
 
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(700));
-        expectPlaintext(ca.wasWithinAuthority(root), true);
+        expectPlaintext(ca.wasWithinAuthority(op.account(), AGENT, root), true);
         (, uint64 count) = ca.agentInfo(op.account(), AGENT);
         assertEq(count, 1);
         (bool anchored,,) = ca.verifyAction(root);
         assertTrue(anchored);
+    }
+
+    // --------------------------------------------------------------- audit fixes
+
+    /// A revoked agent can no longer act (revoke now gates act, not just zeroes budget).
+    function test_revoked_agent_cannot_act() public {
+        _grant(1000);
+        vm.prank(op.account());
+        ca.revokeAuthority(AGENT);
+
+        InEuint32 memory inAmt = op.createInEuint32(100);
+        vm.prank(op.account());
+        vm.expectRevert(abi.encodeWithSelector(ConfidentialAuthority.AgentRevoked.selector, AGENT));
+        ca.act(AGENT, inAmt, keccak256("post-revoke"));
+    }
+
+    /// The same agent cannot record the same proofRoot twice (anti-replay).
+    function test_same_agent_cannot_reuse_proof_root() public {
+        _grant(1000);
+        bytes32 root = keccak256("once");
+        _act(100, root);
+
+        InEuint32 memory inAmt = op.createInEuint32(100);
+        vm.prank(op.account());
+        vm.expectRevert(abi.encodeWithSelector(ConfidentialAuthority.ProofRootReused.selector, root));
+        ca.act(AGENT, inAmt, root);
+    }
+
+    /// Compliance flags are namespaced per operator+agent: a second operator acting
+    /// with the same proofRoot cannot forge or clobber the first operator's flag.
+    function test_compliance_flag_is_operator_scoped() public {
+        _grant(1000);
+        bytes32 root = keccak256("shared-root");
+        _act(300, root);
+        expectPlaintext(ca.wasWithinAuthority(op.account(), AGENT, root), true);
+
+        // a different operator acts with the SAME proofRoot
+        CofheClient mal = createCofheClient();
+        mal.connect(0xBEEF);
+        InEuint32 memory ml = mal.createInEuint32(1);
+        vm.prank(mal.account());
+        ca.grantAuthority(AGENT, ml);
+        InEuint32 memory ma = mal.createInEuint32(1);
+        vm.prank(mal.account());
+        ca.act(AGENT, ma, root);
+
+        // the first operator's attestation is untouched and still theirs to unseal
+        expectPlaintext(ca.wasWithinAuthority(op.account(), AGENT, root), true);
+        // the attacker's flag lives in its own separate slot
+        expectPlaintext(ca.wasWithinAuthority(mal.account(), AGENT, root), true);
     }
 }
