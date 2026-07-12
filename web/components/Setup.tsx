@@ -42,7 +42,7 @@ export function Setup({ onSave, onConnectLocal }: { onSave: (ca: string) => void
       </div>
       <div className="mt-2.5 text-[12px] leading-[1.6] text-dim">
         <b className="text-white">Local chain (real, no wallet):</b> run <code>anvil</code> then{" "}
-        <code>make deploy-local</code>, and click <b className="text-white">Connect local chain</b> — Act/Verify become
+        <code>make deploy-local</code>, and click <b className="text-white">Connect local chain</b> - Act/Verify become
         real on-chain transactions. Confidentiality stays simulated (CoFHE isn&apos;t on local anvil).
         <br />
         <b className="text-white">Testnet (Sepolia):</b> <code>make deploy-verify</code>, paste the{" "}

@@ -23,7 +23,7 @@ const cloneRecord = (r: RecordStep[]): RecordStep[] =>
 
 const time = () => new Date().toLocaleTimeString([], { hour12: false });
 const short = (h: string) =>
-  !h ? "—" : h.length > 18 ? `${h.slice(0, 10)}…${h.slice(-6)}` : h;
+  !h ? "-" : h.length > 18 ? `${h.slice(0, 10)}…${h.slice(-6)}` : h;
 const startsHex = (s: string) => typeof s === "string" && s.startsWith("0x");
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -49,10 +49,10 @@ function initialView(): HeroView {
     agentName: "agent-1",
     ledger: [],
     beat: -1,
-    privHandle: "—",
+    privHandle: "-",
     privClear: null,
     meterOn: 0,
-    pub: { anchored: false, root: "—", meta: "—", tx: "" },
+    pub: { anchored: false, root: "-", meta: "-", tx: "" },
     // no timestamp on the seed line → no SSR/client hydration mismatch
     log: [{ t: "", msg: "Simulation ready. Press ▶ Run pitch, or drive it yourself." }],
     net: { account: null, chainOk: false },
@@ -113,7 +113,7 @@ export function useHero() {
       void engineRef.current.grant(ethers.id(ref.current.agentName), ref.current.limit);
     }
     setView({ mode: "local" });
-    log("Connected to local Arbitrum (anvil). Actions now anchor on-chain for real — confidentiality stays simulated.", "ok");
+    log("Connected to local Arbitrum (anvil). Actions now anchor on-chain for real - confidentiality stays simulated.", "ok");
   }
 
   function pickMode() {
@@ -148,7 +148,7 @@ export function useHero() {
     log(
       v.mode === "live"
         ? "Encrypting limit client-side, granting on-chain…"
-        : "Granting encrypted authority — the limit never appears in the clear.",
+        : "Granting encrypted authority - the limit never appears in the clear.",
       "pending",
     );
     const r = await engineRef.current.grant(ethers.id(v.agentName), v.limit);
@@ -162,7 +162,7 @@ export function useHero() {
       meterOn: 10,
       amount: Math.min(s.amount, s.limit),
     }));
-    log("Authority granted · budget encrypted. Public side is still empty — nothing has acted yet.", "ok");
+    log("Authority granted · budget encrypted. Public side is still empty - nothing has acted yet.", "ok");
   }
 
   async function doAct(amount: number) {
@@ -190,7 +190,7 @@ export function useHero() {
       r.within === true
         ? "within authority ✓"
         : r.within === false
-          ? "OVER authority ⊘ — no-op on budget, still anchored, nothing leaked"
+          ? "OVER authority ⊘ - no-op on budget, still anchored, nothing leaked"
           : "sealed 🔒";
     log(`Anchored ${short(aRoot)} · ${verdict}`, r.within === false ? "pending" : "ok");
   }
@@ -204,7 +204,7 @@ export function useHero() {
     log(
       v.mode === "live"
         ? "Operator creates a permit and unseals remaining…"
-        : "Operator unseals remaining — only the permit holder can.",
+        : "Operator unseals remaining - only the permit holder can.",
       "pending",
     );
     const r = await engineRef.current.reveal(ethers.id(v.agentName));
@@ -216,7 +216,7 @@ export function useHero() {
       meterOn: Math.max(0, Math.round((remaining / (s.limit || remaining || 1)) * 10)),
     }));
     log(
-      `Remaining authority = ${remaining} — visible to the operator, still encrypted to everyone else.`,
+      `Remaining authority = ${remaining} - visible to the operator, still encrypted to everyone else.`,
       "ok",
     );
   }
@@ -275,7 +275,7 @@ export function useHero() {
     const sleep = (ms: number) =>
       new Promise((res) => setTimeout(res, reducedMotion() ? Math.min(ms, 120) : ms));
     try {
-      log("▶ Running the pitch — five beats.", "pending");
+      log("▶ Running the pitch - five beats.", "pending");
       setView({ beat: 0, limit: 1000 });
       await grant();
       await sleep(1300);
@@ -300,7 +300,7 @@ export function useHero() {
 
   async function connect() {
     const eth = (window as unknown as { ethereum?: { request: (a: unknown) => Promise<unknown> } }).ethereum;
-    if (!eth) return log("No wallet found — simulation still works. Install MetaMask for live mode.", "pending");
+    if (!eth) return log("No wallet found - simulation still works. Install MetaMask for live mode.", "pending");
     try {
       const provider = new ethers.BrowserProvider(eth as ethers.Eip1193Provider);
       await provider.send("eth_requestAccounts", []);
@@ -324,7 +324,7 @@ export function useHero() {
     pickMode();
     const v = ref.current;
     if (v.mode === "live") log(`Live armed · ConfidentialAuthority ${short(v.caAddress)}`, "ok");
-    else log("Saved. Live needs a valid contract + wallet on Arbitrum Sepolia — staying in simulation.", "pending");
+    else log("Saved. Live needs a valid contract + wallet on Arbitrum Sepolia - staying in simulation.", "pending");
   }
 
   function editRecord(stepIdx: number, key: string, val: string) {

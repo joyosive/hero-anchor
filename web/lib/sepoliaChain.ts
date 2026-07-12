@@ -11,7 +11,7 @@ const KEY_RE = /^0x[0-9a-fA-F]{64}$/;
  * 32-byte burner key are present.
  *
  * The burner key comes from NEXT_PUBLIC_FLEET_BURNER_KEY, which is only ever set
- * in a local booth build — the public Netlify bundle has none, so this returns
+ * in a local booth build - the public Netlify bundle has none, so this returns
  * null there and the fleet stays in simulation. The invariant: never sign
  * without a funded throwaway key we deliberately supplied.
  */
@@ -28,7 +28,7 @@ export function resolveSepoliaConfig(opts: {
 /**
  * The deployed ConfidentialAuthority address for the single-agent live path, or
  * "" if not deployed yet. Pre-fills the setup field so the booth operator only
- * needs to connect a wallet — no hand-pasting. The address is public and safe to
+ * needs to connect a wallet - no hand-pasting. The address is public and safe to
  * ship; an empty value keeps the page in simulation until the deploy fills it.
  */
 export function deployedCaAddress(): string {
@@ -46,8 +46,8 @@ export interface SepoliaChain {
 /**
  * Build a fleet anchor contract that signs with a funded burner key on Arbitrum
  * Sepolia. The fleet already sends anchors sequentially (one shared wallet, one
- * tx at a time), so a single burner key is nonce-safe. Returns null — caller
- * falls back to local anvil, then sim — whenever the burner key or a deployed
+ * tx at a time), so a single burner key is nonce-safe. Returns null - caller
+ * falls back to local anvil, then sim - whenever the burner key or a deployed
  * address is absent (see resolveSepoliaConfig).
  */
 export function makeSepoliaContract(): SepoliaChain | null {

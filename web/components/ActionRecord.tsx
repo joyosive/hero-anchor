@@ -14,7 +14,7 @@ export function ActionRecord({
   return (
     <div>
       <div className="mb-2.5 mt-[18px] font-mono text-[10px] uppercase tracking-[2px] text-dim">
-        Action record — edit any field
+        Action record - edit any field
       </div>
       {record.map((rec, i) => (
         <div key={rec.step} className="mb-2.5 rounded-[10px] border border-line2 bg-panel2 px-3.5 py-3">

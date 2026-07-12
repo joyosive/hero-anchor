@@ -16,7 +16,7 @@ const short = (h: string) => (h.length > 14 ? `${h.slice(0, 8)}…${h.slice(-4)}
  * desync from the 3D scene), the QR points the room at the LIVE contract page.
  */
 export function StageOverlay({ view, actions }: { view: FleetView; actions: FleetActions }) {
-  const [caption, setCaption] = useState<StageCaption>({ text: "PRESS SPACE — RUN THE SHIFT", tone: "idle" });
+  const [caption, setCaption] = useState<StageCaption>({ text: "PRESS SPACE - RUN THE SHIFT", tone: "idle" });
   const [qr, setQr] = useState<string | null>(null);
   const prevRef = useRef<FleetView | null>(null);
   const armedRef = useRef(false);
@@ -30,7 +30,7 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // state-driven narration — the caption bar carries the alert emphasis;
+  // state-driven narration - the caption bar carries the alert emphasis;
   // no full-screen effects (this is evidence infrastructure, not a game).
   useEffect(() => {
     const next = stageCaption(view, prevRef.current);
@@ -73,10 +73,10 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
 
   return (
     <div className="pointer-events-none absolute inset-0 z-50 select-none">
-      {/* scrim while the intro or completion card is up — the scene steps back */}
+      {/* scrim while the intro or completion card is up - the scene steps back */}
       {(done || idle) && <div className="absolute inset-0 bg-[rgba(6,7,5,0.68)]" />}
 
-      {/* top bar — brand + live badge */}
+      {/* top bar - brand + live badge */}
       <div className="absolute left-0 right-0 top-0 flex flex-wrap items-start justify-between gap-3 p-[clamp(16px,3vw,32px)]">
         <div>
           <div className="font-mono text-[clamp(20px,2.4vw,28px)] font-bold uppercase tracking-[6px] text-acid">HERO</div>
@@ -100,7 +100,7 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
         </div>
       </div>
 
-      {/* right rail — live proofs + cost + QR. Hidden below md: on a phone it
+      {/* right rail - live proofs + cost + QR. Hidden below md: on a phone it
           would overlap the scene; the captions + cards carry the numbers there. */}
       <div className="absolute right-[clamp(12px,2.5vw,32px)] top-[clamp(96px,14vh,128px)] hidden w-[clamp(250px,26vw,340px)] flex-col gap-3 md:flex">
         <div className="rounded-xl border border-line bg-[rgba(10,11,9,0.85)] p-4">
@@ -170,12 +170,12 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
             {caption.text}
           </div>
           <div className="mt-2 font-mono text-[clamp(9px,1vw,11px)] uppercase tracking-[2px] text-dim">
-            Space — run · F — fullscreen · R — reset {over > 0 && `· over-authority events: ${over}`}
+            Space - run · F - fullscreen · R - reset {over > 0 && `· over-authority events: ${over}`}
           </div>
         </div>
       </div>
 
-      {/* intro card — tells the room what it's about to watch */}
+      {/* intro card - tells the room what it's about to watch */}
       {idle && (
         <div className="absolute left-1/2 top-1/2 w-[min(820px,92vw)] -translate-x-1/2 -translate-y-1/2">
           <div className="rounded-2xl border border-line bg-[rgba(10,11,9,0.96)] px-[clamp(24px,5vw,48px)] py-[clamp(24px,5vh,40px)] text-center">
@@ -183,7 +183,7 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
               Night shift · autonomous warehouse
             </div>
             <div className="mt-4 font-mono text-[clamp(17px,2.2vw,26px)] font-bold uppercase leading-[1.4] tracking-[1px] text-white">
-              Three robots, each under a <span className="text-cyan">sealed mandate</span> — zone, speed, spend.
+              Three robots, each under a <span className="text-cyan">sealed mandate</span> - zone, speed, spend.
               <br />
               Every action becomes <span className="text-acid">evidence on Arbitrum</span>.
             </div>
@@ -204,7 +204,7 @@ export function StageOverlay({ view, actions }: { view: FleetView; actions: Flee
         </div>
       )}
 
-      {/* completion card — sits above the scrim, owns the moment */}
+      {/* completion card - sits above the scrim, owns the moment */}
       {done && (
         <div className="absolute left-1/2 top-1/2 w-[min(760px,92vw)] -translate-x-1/2 -translate-y-1/2">
           <div className="rounded-2xl border border-acid bg-[rgba(10,11,9,0.96)] px-[clamp(24px,5vw,48px)] py-[clamp(24px,5vh,40px)] text-center">

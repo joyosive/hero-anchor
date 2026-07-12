@@ -183,7 +183,7 @@
 
   <div class="lede">
     <h1>A machine obeyed its rules.<br>Prove it <span class="x">without revealing the rules or the action.</span></h1>
-    <p>An autonomous agent acts under an <b>encrypted</b> authority. The contract checks <span style="color:var(--acid)">action&nbsp;≤&nbsp;authority</span> on ciphertext, anchors a public proof on Arbitrum, and only the operator can unseal the numbers. Anchoring is table stakes — the confidentiality is the moat.</p>
+    <p>An autonomous agent acts under an <b>encrypted</b> authority. The contract checks <span style="color:var(--acid)">action&nbsp;≤&nbsp;authority</span> on ciphertext, anchors a public proof on Arbitrum, and only the operator can unseal the numbers. Anchoring is table stakes - the confidentiality is the moat.</p>
   </div>
 
   <div class="grid">
@@ -192,11 +192,11 @@
       <h2>Operator &amp; agent</h2>
       <p class="sub">Grant an encrypted budget, then let the agent act. The action record is the tamper-evidence; its hash is what anchors.</p>
 
-      <div class="sectlabel">Action record — edit any field</div>
+      <div class="sectlabel">Action record - edit any field</div>
       <div id="record"></div>
       <div class="rootprev" id="rootPrev">
         <div class="lbl"><span>Record hash (preview)</span><span>computed in your browser</span></div>
-        <div class="val" id="recRoot">—</div>
+        <div class="val" id="recRoot">-</div>
       </div>
 
       <div class="sectlabel">Grant authority</div>
@@ -228,17 +228,17 @@
         <div class="col pub">
           <div class="ch">◇ Public · verifiable</div>
           <div class="kv"><div class="k">Anchored on Arbitrum</div><div class="v" id="pubAnchored"><span class="muted">awaiting first action</span></div></div>
-          <div class="kv"><div class="k">Proof root</div><div class="v handle" id="pubRoot">—</div></div>
-          <div class="kv"><div class="k">Record</div><div class="v" id="pubMeta"><span class="muted">—</span></div></div>
-          <div class="kv"><div class="k">Transaction</div><div class="v" id="pubLink"><span class="muted">—</span></div></div>
+          <div class="kv"><div class="k">Proof root</div><div class="v handle" id="pubRoot">-</div></div>
+          <div class="kv"><div class="k">Record</div><div class="v" id="pubMeta"><span class="muted">-</span></div></div>
+          <div class="kv"><div class="k">Transaction</div><div class="v" id="pubLink"><span class="muted">-</span></div></div>
           <button id="verifyBtn" class="ghost" style="margin-top:6px" disabled>Verify last proof</button>
         </div>
         <div class="col priv">
           <div class="ch">🔒 Private · encrypted</div>
-          <div class="kv"><div class="k">Remaining authority (ciphertext)</div><div class="handle" id="privHandle">—</div></div>
+          <div class="kv"><div class="k">Remaining authority (ciphertext)</div><div class="handle" id="privHandle">-</div></div>
           <div class="meter" id="meter"></div>
           <div class="kv" style="margin-top:12px"><div class="k">Operator view (unsealed)</div><div class="clear sealed" id="privClear">•sealed•</div></div>
-          <button id="revealBtn" class="ghost revealbtn" disabled>Reveal — operator only</button>
+          <button id="revealBtn" class="ghost revealbtn" disabled>Reveal - operator only</button>
         </div>
       </div>
     </section>
@@ -246,7 +246,7 @@
 
   <section class="panel">
     <h2>Action ledger &amp; proof timeline</h2>
-    <p class="sub">Every action anchors a public proof; the amounts and budget stay encrypted. Over-authority actions are a silent no-op — still anchored, nothing leaked.</p>
+    <p class="sub">Every action anchors a public proof; the amounts and budget stay encrypted. Over-authority actions are a silent no-op - still anchored, nothing leaked.</p>
     <div class="beatlbl"><span>Pitch timeline</span><span id="beatName">idle</span></div>
     <div class="beats" id="beats"></div>
     <div class="ledger" id="ledger"></div>
@@ -313,7 +313,7 @@ let cofhe=null, cofheReady=false;
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r=>setTimeout(r, reduced()? Math.min(ms,120): ms));
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const short = h => !h ? '—' : (h.length>18 ? h.slice(0,10)+'…'+h.slice(-6) : h);
+const short = h => !h ? '-' : (h.length>18 ? h.slice(0,10)+'…'+h.slice(-6) : h);
 
 // ---------- hashing ----------
 function buildRoot(records){
@@ -325,7 +325,7 @@ function buildRoot(records){
 }
 function recordRoot(){ return buildRoot(state.record); }
 function actRootFor(rRoot, seq){ return ethers.keccak256(ethers.concat([rRoot, ethers.toBeHex(seq, 32)])); }
-// deterministic, non-reversible display handle — never encodes the value
+// deterministic, non-reversible display handle - never encodes the value
 function handleFor(salt, nonce){ return ethers.keccak256(ethers.toUtf8Bytes('hero:'+salt+':'+nonce)); }
 
 // ---------- rendering ----------
@@ -373,7 +373,7 @@ function renderLedger(){
   const host=$('ledger'); host.innerHTML='';
   const head=document.createElement('div'); head.className='lrow head';
   head.innerHTML='<span>#</span><span>proof root</span><span>verdict</span><span>anchor</span>'; host.appendChild(head);
-  if(state.ledger.length===0){ const e=document.createElement('div'); e.className='empty'; e.textContent='No actions yet — encrypted budget is untouched.'; host.appendChild(e); return; }
+  if(state.ledger.length===0){ const e=document.createElement('div'); e.className='empty'; e.textContent='No actions yet - encrypted budget is untouched.'; host.appendChild(e); return; }
   state.ledger.forEach(e=>{
     const row=document.createElement('div'); row.className='lrow';
     const vd = e.within===true?'<span class="within">within ✓</span>': e.within===false?'<span class="over">over ⊘</span>':'<span class="sealed">🔒 sealed</span>';
@@ -382,12 +382,12 @@ function renderLedger(){
   });
 }
 function anchorCell(tx){
-  if(!tx) return '<span class="muted">—</span>';
+  if(!tx) return '<span class="muted">-</span>';
   if(state.mode==='live') return '<a target="_blank" rel="noopener" href="'+CONFIG.explorer+'/tx/'+tx+'">arbiscan ↗</a>';
   return '<span class="muted">sim</span>';
 }
 function linkFor(tx){
-  if(!tx) return '<span class="muted">—</span>';
+  if(!tx) return '<span class="muted">-</span>';
   if(state.mode==='live') return '<a target="_blank" rel="noopener" href="'+CONFIG.explorer+'/tx/'+tx+'">'+short(tx)+' ↗</a>';
   return '<span class="muted">sim '+short(tx)+'</span>';
 }
@@ -509,14 +509,14 @@ async function onGrant(){
   const limit=Number($('limitInput').value||0);
   if(!(limit>0)){ logLine('Enter a positive limit to grant.','err'); return; }
   state.limitClear=limit;
-  logLine(state.mode==='live'?'Encrypting limit client-side, granting on-chain…':'Granting encrypted authority — the limit never appears in the clear.','pending');
+  logLine(state.mode==='live'?'Encrypting limit client-side, granting on-chain…':'Granting encrypted authority - the limit never appears in the clear.','pending');
   const r=await engine.grant(limit);
   if(r && r.ok===false){ logLine('Grant failed.','err'); return; }
   state.granted=true;
   const h=(r && typeof r.handle==='string' && r.handle.startsWith('0x'))? r.handle : handleFor('rem',0);
   shuffleLock($('privHandle'), h); renderMeter(10); reMaskClear();
   $('amountSlider').max=String(limit);
-  logLine('Authority granted · budget encrypted. Public side is still empty — nothing has acted yet.','ok');
+  logLine('Authority granted · budget encrypted. Public side is still empty - nothing has acted yet.','ok');
   refreshButtons();
 }
 async function doAct(amount, label){
@@ -535,7 +535,7 @@ async function doAct(amount, label){
   shuffleLock($('privHandle'), handleFor('rem', seq+1)); pulseMeter();
   addLedgerEntry(seq, ('within' in r)? r.within : null, aRoot, r.tx);
   const within=('within' in r)? r.within : null;
-  const v = within===true?'within authority ✓': within===false?'OVER authority ⊘ — no-op on budget, still anchored, nothing leaked':'sealed 🔒 (unseal to see verdict)';
+  const v = within===true?'within authority ✓': within===false?'OVER authority ⊘ - no-op on budget, still anchored, nothing leaked':'sealed 🔒 (unseal to see verdict)';
   logLine('Anchored '+short(aRoot)+' · '+v, within===false?'pending':'ok');
   refreshButtons();
 }
@@ -543,11 +543,11 @@ function addLedgerEntry(seq, within, root, tx){ state.ledger[seq]={seq,within,ro
 function overAmount(){ return state.mode==='sim' ? (Number(state.remainingClear)||0)+100 : (state.limitClear? state.limitClear+1 : 999999); }
 async function onReveal(){
   if(!state.granted){ logLine('Nothing to reveal yet.','err'); return; }
-  logLine(state.mode==='live'?'Operator creates a permit and unseals remaining…':'Operator unseals remaining — only the permit holder can.','pending');
+  logLine(state.mode==='live'?'Operator creates a permit and unseals remaining…':'Operator unseals remaining - only the permit holder can.','pending');
   const r=await engine.reveal();
   if(r.remainingClear==null){ logLine('Reveal unavailable.','err'); return; }
   decryptReveal($('privClear'), String(r.remainingClear)); fillMeter(r.remainingClear);
-  logLine('Remaining authority = '+r.remainingClear+' — visible to the operator, still encrypted to everyone else.','ok');
+  logLine('Remaining authority = '+r.remainingClear+' - visible to the operator, still encrypted to everyone else.','ok');
 }
 async function onRevoke(){
   if(!state.granted){ return; }
@@ -575,7 +575,7 @@ async function runPitch(){
   if(state.running) return;
   resetDemo(); state.running=true; $('runBtn').disabled=true; setControls(false);
   try{
-    logLine('▶ Running the pitch — five beats.','pending');
+    logLine('▶ Running the pitch - five beats.','pending');
     setBeat(0); $('limitInput').value='1000'; await onGrant(); await sleep(1300);
     setBeat(1); $('amountSlider').value='300'; $('amountLabel').textContent='300'; await doAct(300); await sleep(1300);
     setBeat(2); $('amountSlider').value='400'; $('amountLabel').textContent='400'; await doAct(400); await sleep(1300);
@@ -586,9 +586,9 @@ async function runPitch(){
 }
 function resetDemo(){
   Object.assign(state, { granted:false, revoked:false, limitClear:null, remainingClear:null, ledger:[], currentActRoot:null, beat:-1 });
-  $('privHandle').textContent='—'; reMaskClear(); renderMeter(0);
+  $('privHandle').textContent='-'; reMaskClear(); renderMeter(0);
   $('pubAnchored').innerHTML='<span class="muted">awaiting first action</span>';
-  $('pubRoot').textContent='—'; $('pubMeta').innerHTML='<span class="muted">—</span>'; $('pubLink').innerHTML='<span class="muted">—</span>';
+  $('pubRoot').textContent='-'; $('pubMeta').innerHTML='<span class="muted">-</span>'; $('pubLink').innerHTML='<span class="muted">-</span>';
   renderLedger(); renderBeats(); refreshButtons();
 }
 
@@ -600,7 +600,7 @@ async function ensureNetwork(){
     nativeCurrency:{ name:'Ether', symbol:'ETH', decimals:18 }, blockExplorerUrls:[CONFIG.explorer] }] }); } else { throw e; } }
 }
 async function connect(){
-  if(!window.ethereum){ logLine('No wallet found — simulation still works. Install MetaMask for live mode.','pending'); return; }
+  if(!window.ethereum){ logLine('No wallet found - simulation still works. Install MetaMask for live mode.','pending'); return; }
   try{
     provider=new ethers.BrowserProvider(window.ethereum);
     await provider.send('eth_requestAccounts',[]);
@@ -620,7 +620,7 @@ function onSaveSetup(){
   state.anchorAddress=($('anchorInput').value||'').trim();
   pickMode();
   if(state.mode==='live') logLine('Live armed · ConfidentialAuthority '+short(state.caAddress),'ok');
-  else logLine('Saved. Live needs a valid contract + wallet on Arbitrum Sepolia — staying in simulation.','pending');
+  else logLine('Saved. Live needs a valid contract + wallet on Arbitrum Sepolia - staying in simulation.','pending');
 }
 
 // ---------- wiring ----------

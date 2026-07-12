@@ -18,12 +18,12 @@ beforeAll(async () => {
 describe("on-chain e2e (requires anvil + make deploy-local)", () => {
   it("anchors + verifies a root through the real chainEngine", async () => {
     if (!up) {
-      console.warn("[e2e] anvil not reachable at " + ANVIL_RPC + " — skipping (this is fine locally/CI)");
+      console.warn("[e2e] anvil not reachable at " + ANVIL_RPC + " - skipping (this is fine locally/CI)");
       return;
     }
     const contract = makeLocalContract();
     if (!contract) {
-      console.warn("[e2e] no deployment in deployed.local.json — run `make deploy-local` — skipping");
+      console.warn("[e2e] no deployment in deployed.local.json - run `make deploy-local` - skipping");
       return;
     }
     const e = createChainEngine({ contract, log: () => {} });
@@ -37,7 +37,7 @@ describe("on-chain e2e (requires anvil + make deploy-local)", () => {
     expect(v.anchored).toBe(true);
     expect(v.timestamp).toBeGreaterThan(0);
 
-    // replay the SAME root (already on-chain) — the AlreadyAnchored recovery must
+    // replay the SAME root (already on-chain) - the AlreadyAnchored recovery must
     // report anchored:true, NOT a hard failure. This is the "second run" case.
     const again = await e.act("r", 100, root);
     expect(again.anchored).toBe(true);

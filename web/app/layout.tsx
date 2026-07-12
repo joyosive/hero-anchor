@@ -23,7 +23,7 @@ const body = Inter({
 export const metadata: Metadata = {
   title: "Hero · Confidential Proof of Action",
   description:
-    "An autonomous agent proves it acted within its authority — without revealing the authority or the action. Confidential proof-of-action on Arbitrum.",
+    "An autonomous agent proves it acted within its authority - without revealing the authority or the action. Confidential proof-of-action on Arbitrum.",
 };
 
 export default function RootLayout({

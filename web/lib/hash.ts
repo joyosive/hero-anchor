@@ -4,7 +4,7 @@ import type { RecordStep } from "./types";
 /**
  * Level-1 tamper-evident hash chain over the action record.
  * h0 = keccak(ZeroHash || rec0); hi = keccak(h(i-1) || reci). Final = root.
- * Editing any field changes the root — that is the tamper-evidence.
+ * Editing any field changes the root - that is the tamper-evidence.
  */
 export function buildRoot(records: RecordStep[]): string {
   let prev = ethers.ZeroHash;

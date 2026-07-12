@@ -3,14 +3,14 @@ import { handleFor } from "./hash";
 
 /**
  * Deterministic local engine. The true budget lives in this closure and is
- * ONLY returned by reveal() — it never flows into React state otherwise, so it
+ * ONLY returned by reveal() - it never flows into React state otherwise, so it
  * cannot leak into the rendered DOM. Never throws.
  *
  * The branchless rule mirrors the on-chain contract: within = amount <= remaining;
  * an over-authority action is a no-op on the budget but is still "anchored".
  */
 export function createSimEngine(): Engine {
-  let remaining: number | null = null; // SECRET — closure only
+  let remaining: number | null = null; // SECRET - closure only
   let granted = false;
   let revoked = false;
   let count = 0;

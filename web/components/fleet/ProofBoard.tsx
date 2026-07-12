@@ -5,7 +5,7 @@ import type { FleetLedgerRow } from "@/lib/fleet/types";
 
 const short = (h: string) => h.slice(0, 8) + "…";
 
-/** A standing board that stacks the latest anchored proofs — anchoring made visible. */
+/** A standing board that stacks the latest anchored proofs - anchoring made visible. */
 export function ProofBoard({ rows }: { rows: FleetLedgerRow[] }) {
   const latest = rows.slice(-6).reverse();
 

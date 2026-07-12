@@ -51,7 +51,7 @@ body {
   }
 }
 
-/* range slider — themed to identity */
+/* range slider - themed to identity */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;

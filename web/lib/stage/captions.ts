@@ -31,19 +31,19 @@ export function stageCaption(view: FleetView, prev: FleetView | null): StageCapt
     const n = view.ledger.length;
     return {
       tone: "done",
-      text: `SHIFT COMPLETE — ${n} ACTIONS, ${n} PROOFS ON ARBITRUM · TOTAL COST ${totalCostUsd(n)}`,
+      text: `SHIFT COMPLETE - ${n} ACTIONS, ${n} PROOFS ON ARBITRUM · TOTAL COST ${totalCostUsd(n)}`,
     };
   }
 
   if (newRows.some((r) => r.within === false)) {
     return {
       tone: "alert",
-      text: "MANDATE EXCEEDED — the violation is provable · the mandate stays sealed",
+      text: "MANDATE EXCEEDED - the violation is provable · the mandate stays sealed",
     };
   }
 
   if (newRows.length > 0 && prevLedger === 0) {
-    return { tone: "ok", text: "FIRST PROOF ANCHORED — a real Arbitrum transaction · tap it, verify it" };
+    return { tone: "ok", text: "FIRST PROOF ANCHORED - a real Arbitrum transaction · tap it, verify it" };
   }
 
   if (newRows.length > 0) {
@@ -51,11 +51,11 @@ export function stageCaption(view: FleetView, prev: FleetView | null): StageCapt
   }
 
   if (view.running && prev?.running !== true) {
-    return { tone: "ok", text: "SHIFT RUNNING — EVERY ACTION BECOMES EVIDENCE ON ARBITRUM" };
+    return { tone: "ok", text: "SHIFT RUNNING - EVERY ACTION BECOMES EVIDENCE ON ARBITRUM" };
   }
 
   if (!view.running && view.ledger.length === 0 && (prev === null || prev.ledger.length > 0 || prev.running)) {
-    return { tone: "idle", text: "PRESS SPACE — RUN THE SHIFT" };
+    return { tone: "idle", text: "PRESS SPACE - RUN THE SHIFT" };
   }
 
   return null;

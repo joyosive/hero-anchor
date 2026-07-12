@@ -7,7 +7,7 @@ import "../src/HeroProofAnchor.sol";
 /// @notice Measured gas for the two anchoring paths, so the cost story is
 ///         measured, not asserted.
 ///
-///         These are EXECUTION gas numbers — they exclude the 21,000 intrinsic
+///         These are EXECUTION gas numbers - they exclude the 21,000 intrinsic
 ///         tx cost, calldata, and any L2 data fee. That's deliberate: execution
 ///         gas is the part batching does NOT change (each anchored root is one
 ///         cold SSTORE either way). The batching win comes from amortizing the

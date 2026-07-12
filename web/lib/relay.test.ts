@@ -19,7 +19,7 @@ describe("TokenBucket", () => {
   });
 });
 
-describe("IpBuckets — one hostile client cannot starve the stage demo", () => {
+describe("IpBuckets - one hostile client cannot starve the stage demo", () => {
   it("rate-limits per IP: exhausting one IP leaves another untouched", () => {
     const b = new IpBuckets(2, 0); // 2 takes per IP, no refill
     expect(b.take("attacker")).toBe(true);

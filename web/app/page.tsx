@@ -2,7 +2,7 @@ import Link from "next/link";
 
 // The front door tells the CEO-deck story, in the deck's own words.
 // The demos live behind the three doors at the top and bottom.
-// (Site chrome — logo, tabs, live badge — comes from SiteHeader in the layout.)
+// (Site chrome - logo, tabs, live badge - comes from SiteHeader in the layout.)
 
 const PROBLEMS = [
   {
@@ -87,7 +87,7 @@ export default function Home() {
         </h2>
         <p className="mt-4 max-w-[820px] text-[15px] leading-[1.65] text-muted">
           For physical AI, mistakes are permanent and logs are legal evidence: they must survive the operator, stay
-          tamper-evident, and be independently checkable — while operations remain trade secrets. Verification has to
+          tamper-evident, and be independently checkable - while operations remain trade secrets. Verification has to
           work on <span className="text-white">encrypted</span> behaviour. That is evidence infrastructure, not agent
           tooling with servos.
         </p>
@@ -119,9 +119,9 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[11.5px] uppercase tracking-[1.5px]">
-          <span><span className="text-acid">No token</span> <span className="text-dim">— neutrality engineered in, not sold</span></span>
-          <span><span className="text-acid">No admin keys</span> <span className="text-dim">— an anchor an admin can edit is not a trust anchor</span></span>
-          <span><span className="text-acid">Roots only on-chain</span> <span className="text-dim">— raw telemetry never leaves the operator</span></span>
+          <span><span className="text-acid">No token</span> <span className="text-dim">- neutrality engineered in, not sold</span></span>
+          <span><span className="text-acid">No admin keys</span> <span className="text-dim">- an anchor an admin can edit is not a trust anchor</span></span>
+          <span><span className="text-acid">Roots only on-chain</span> <span className="text-dim">- raw telemetry never leaves the operator</span></span>
         </div>
       </section>
 
@@ -147,10 +147,10 @@ export default function Home() {
         </div>
         <div className="mt-5 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[12px] uppercase tracking-[1.5px]">
           <a href={ANCHOR_URL} target="_blank" rel="noopener noreferrer" className="text-acid underline decoration-dotted underline-offset-4 hover:opacity-80">
-            HeroProofAnchor — verified source ↗
+            HeroProofAnchor - verified source ↗
           </a>
           <a href={CA_URL} target="_blank" rel="noopener noreferrer" className="text-acid underline decoration-dotted underline-offset-4 hover:opacity-80">
-            ConfidentialAuthority (FHE) — verified source ↗
+            ConfidentialAuthority (FHE) - verified source ↗
           </a>
         </div>
       </section>

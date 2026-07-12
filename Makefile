@@ -4,7 +4,7 @@ export
 RPC ?= $(RPC_URL)
 ADDRESS ?= $(ANCHOR_ADDRESS)
 
-# Local chain (anvil). ANVIL_KEY is the well-known anvil account 0 — public, local only.
+# Local chain (anvil). ANVIL_KEY is the well-known anvil account 0 - public, local only.
 ANVIL_RPC ?= http://127.0.0.1:8545
 ANVIL_KEY ?= 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 

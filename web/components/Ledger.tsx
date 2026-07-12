@@ -12,7 +12,7 @@ function verdict(within: boolean | null) {
 }
 
 function anchorCell(tx: string, mode: string) {
-  if (!tx) return <span className="text-muted">—</span>;
+  if (!tx) return <span className="text-muted">-</span>;
   if (mode === "live")
     return (
       <a target="_blank" rel="noopener noreferrer" href={`${EXPLORER}/tx/${tx}`}>
@@ -36,7 +36,7 @@ export function Ledger({ view }: { view: HeroView }) {
       </div>
       {view.ledger.length === 0 ? (
         <div className="px-3.5 py-4 font-mono text-[11.5px] text-dim">
-          No actions yet — encrypted budget is untouched.
+          No actions yet - encrypted budget is untouched.
         </div>
       ) : (
         view.ledger.map((e) => (

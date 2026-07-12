@@ -15,5 +15,5 @@ if (out.errors) {
 const c = out.contracts['HeroProofAnchor.sol']['HeroProofAnchor'];
 fs.writeFileSync('offchain/HeroProofAnchor.abi.json', JSON.stringify(c.abi, null, 2));
 fs.writeFileSync('offchain/HeroProofAnchor.bytecode.txt', '0x'+c.evm.bytecode.object);
-console.log('COMPILE OK — bytecode bytes:', c.evm.bytecode.object.length/2);
+console.log('COMPILE OK - bytecode bytes:', c.evm.bytecode.object.length/2);
 console.log('ABI methods:', c.abi.filter(x=>x.type==='function').map(f=>f.name).join(', '));

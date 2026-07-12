@@ -9,7 +9,7 @@ export function Lede() {
       <p className="mt-3.5 text-[16.5px] text-muted">
         An autonomous agent acts under an <b className="text-white">encrypted</b> authority. The contract checks{" "}
         <span className="text-acid">action ≤ authority</span> on ciphertext, anchors a public proof on Arbitrum,
-        and only the operator can unseal the numbers. Anchoring is table stakes — the confidentiality is the moat.
+        and only the operator can unseal the numbers. Anchoring is table stakes - the confidentiality is the moat.
       </p>
     </div>
   );

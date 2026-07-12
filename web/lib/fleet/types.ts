@@ -1,4 +1,4 @@
-// L2 attested robot fleet — shared types. Zero external deps.
+// L2 attested robot fleet - shared types. Zero external deps.
 
 export interface Percept {
   robotId: string;
@@ -79,7 +79,7 @@ export interface FleetView {
   running: boolean;
   step: number;
   onChain: boolean; // when true, each action anchors a real tx on the target chain
-  chainLabel: string; // "local anvil" | "Arbitrum Sepolia" — the armed on-chain target
+  chainLabel: string; // "local anvil" | "Arbitrum Sepolia" - the armed on-chain target
   explorer: string | null; // block-explorer base (e.g. arbiscan); null when there's none (anvil/sim)
   robots: RobotView[];
   ledger: FleetLedgerRow[];

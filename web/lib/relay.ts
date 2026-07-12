@@ -13,7 +13,7 @@ import deployed from "./deployed.sepolia.json";
 
 const ROOT_RE = /^0x[0-9a-fA-F]{64}$/;
 
-/** Strict 32-byte hex check — the ONLY input shape the relay accepts. */
+/** Strict 32-byte hex check - the ONLY input shape the relay accepts. */
 export function isValidRoot(s: unknown): s is string {
   return typeof s === "string" && ROOT_RE.test(s);
 }
@@ -41,7 +41,7 @@ export class TokenBucket {
 
 /**
  * Per-IP token buckets so one hostile client can't starve everyone else
- * (the stage demo included). Oldest entries are evicted at maxIps — a
+ * (the stage demo included). Oldest entries are evicted at maxIps - a
  * bounded map, so a scanner rotating IPs can't grow memory either.
  */
 export class IpBuckets {
@@ -93,7 +93,7 @@ const errMsg = (e: unknown) => {
 
 /**
  * Anchor-via-relay engine: real anchor txs through /api/relay-anchor, with the
- * within/over budget check in a local closure — the same honesty contract as
+ * within/over budget check in a local closure - the same honesty contract as
  * chainEngine (the fleet's confidential check is a stand-in, and labeled so).
  */
 export function createRelayEngine(opts: { endpoint?: string; log: (m: string, c?: string) => void }): Engine {

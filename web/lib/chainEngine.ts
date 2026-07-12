@@ -20,7 +20,7 @@ const errMsg = (e: unknown) => {
 
 /**
  * Anchor-only engine: real anchor()/verify() on-chain (L3), with the within/over
- * budget check in a local closure (L3+ confidential stays simulated — CoFHE is
+ * budget check in a local closure (L3+ confidential stays simulated - CoFHE is
  * absent on plain anvil). Same Engine interface as sim/live.
  */
 export function createChainEngine(opts: { contract: Contract; log: (m: string, c?: string) => void }): Engine {
@@ -54,7 +54,7 @@ export function createChainEngine(opts: { contract: Contract; log: (m: string, c
         return { within, root, sequence, anchored: true, tx: tx.hash };
       } catch (e) {
         // The anchor reverted. If the root is ALREADY on-chain (a replay, or an
-        // attacker pre-anchored it), that's still "anchored", not a failure — so
+        // attacker pre-anchored it), that's still "anchored", not a failure - so
         // check on-chain state rather than parse ethers' (inconsistent) error shape.
         try {
           const [already] = await contract.verify(root);

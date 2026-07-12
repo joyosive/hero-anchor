@@ -7,7 +7,7 @@ import { useFleet } from "@/lib/fleet/useFleet";
 import { FleetHud } from "@/components/fleet/FleetHud";
 import { StageOverlay } from "@/components/stage/StageOverlay";
 
-// 3D scene is client-only — never touches SSR.
+// 3D scene is client-only - never touches SSR.
 const FleetScene = dynamic(() => import("@/components/fleet/FleetScene"), { ssr: false });
 
 function Fleet() {
@@ -34,7 +34,7 @@ function Fleet() {
     // the height left by the header (full viewport in stage mode, where the
     // header renders nothing). Avoids the 0-height percentage-chain trap.
     <main className="relative min-h-0 w-full flex-1 overflow-hidden bg-bg">
-      {/* isolate: the 3D scene's floating labels use very high z-indexes —
+      {/* isolate: the 3D scene's floating labels use very high z-indexes -
           containing them here keeps every overlay above the scene */}
       <div className="absolute inset-0 isolate z-0">
         <FleetScene robots={view.robots} ledger={view.ledger} showBoard={!stage} />

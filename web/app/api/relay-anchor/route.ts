@@ -7,7 +7,7 @@ import { RPC, EXPLORER } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Server-side anchor relay. Holds FLEET_RELAYER_KEY (a TESTNET throwaway, set
-// only in the deployment environment — never NEXT_PUBLIC_, never in the
+// only in the deployment environment - never NEXT_PUBLIC_, never in the
 // bundle). Exposes exactly one on-chain capability: anchor(bytes32) on the
 // deployed HeroProofAnchor. Strict input validation + token-bucket limiting;
 // worst-case abuse = a few dollars of testnet gas.
@@ -15,7 +15,7 @@ import { RPC, EXPLORER } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-// Per-IP first (burst 25, ~12/min sustained — one full shift is 18 anchors),
+// Per-IP first (burst 25, ~12/min sustained - one full shift is 18 anchors),
 // so a hostile client exhausts only its own allowance, never the stage
 // demo's. A generous global bucket backstops total testnet-gas burn.
 const perIp = new IpBuckets(25, 0.2);
@@ -33,7 +33,7 @@ function relayer(): ethers.Contract | null {
   return contract;
 }
 
-/** Availability probe: {live} — true iff a well-formed server key is configured. */
+/** Availability probe: {live} - true iff a well-formed server key is configured. */
 export async function GET() {
   const c = relayer();
   return NextResponse.json({
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     await tx.wait();
     return NextResponse.json({ ok: true, tx: tx.hash, explorer: `${EXPLORER}/tx/${tx.hash}` });
   } catch {
-    // Already anchored (replay / pre-anchor griefing) still counts as anchored —
+    // Already anchored (replay / pre-anchor griefing) still counts as anchored -
     // same on-chain-state recovery as chainEngine, cheaper than parsing errors.
     try {
       const [already] = await c.verify(body.root);

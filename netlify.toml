@@ -1,4 +1,4 @@
-# Netlify config — the Next.js app lives in web/ (this repo is a Foundry root).
+# Netlify config - the Next.js app lives in web/ (this repo is a Foundry root).
 [build]
   base = "web"
   command = "npm run build"

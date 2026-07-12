@@ -27,7 +27,7 @@ export default function ProofWalkthrough() {
   return (
     <main className="mx-auto max-w-[1220px] px-[26px] pb-16 pt-8">
       <Lede />
-      {/* walkthrough controls — page content, not a second header bar */}
+      {/* walkthrough controls - page content, not a second header bar */}
       <div className="mb-5 mt-2 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
         <div className="flex items-center gap-2.5">
           <Pill tone={view.mode === "sim" ? "sim" : "live"} dot>
@@ -67,7 +67,7 @@ export default function ProofWalkthrough() {
         </h2>
         <p className="mb-[18px] text-[13.5px] text-muted">
           Every action anchors a public proof; the amounts and budget stay encrypted. Over-authority actions are a
-          silent no-op — still anchored, nothing leaked.
+          silent no-op - still anchored, nothing leaked.
         </p>
         <Beats beat={view.beat} />
         <Ledger view={view} />
@@ -76,9 +76,9 @@ export default function ProofWalkthrough() {
       </section>
 
       <p className="mt-5 rounded-[10px] border border-line2 bg-panel2 px-4 py-3 font-mono text-[11px] leading-[1.7] text-dim">
-        This walkthrough runs the same math the live contract enforces — see the{" "}
+        This walkthrough runs the same math the live contract enforces - see the{" "}
         <a href="/fleet?stage=1" className="text-acid underline decoration-dotted underline-offset-2">Live Demo</a>{" "}
-        for real Arbitrum transactions. Direct wallet mode (operators driving the contract with their own keys — no
+        for real Arbitrum transactions. Direct wallet mode (operators driving the contract with their own keys - no
         relayer trust) is temporarily offline: upstream Fhenix testnet issue, details in SECURITY.md.
       </p>
 

@@ -24,7 +24,7 @@ function Meter({ on }: { on: number }) {
 }
 
 function txCell(tx: string, mode: string) {
-  if (!tx) return <span className="text-muted">—</span>;
+  if (!tx) return <span className="text-muted">-</span>;
   const shortTx = `${tx.slice(0, 10)}…${tx.slice(-6)}`;
   if (mode === "live")
     return (
@@ -101,7 +101,7 @@ export function ProofSplit({
             />
           </div>
           <Btn variant="ghost" className="mt-2.5" onClick={onReveal} disabled={!view.granted}>
-            Reveal — operator only
+            Reveal - operator only
           </Btn>
         </div>
       </div>

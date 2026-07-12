@@ -11,7 +11,7 @@ import type { RobotView, FleetLedgerRow } from "@/lib/fleet/types";
 export default function FleetScene({
   robots,
   ledger,
-  showBoard = true, // stage mode hides the in-scene board — the overlay owns the ledger there
+  showBoard = true, // stage mode hides the in-scene board - the overlay owns the ledger there
 }: {
   robots: RobotView[];
   ledger: FleetLedgerRow[];

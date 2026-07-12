@@ -6,7 +6,7 @@ next-env.d.ts
 *.tsbuildinfo
 .DS_Store
 
-# local env files — the fleet booth burner key lives in .env.local, never commit it
+# local env files - the fleet booth burner key lives in .env.local, never commit it
 .env
 .env.local
 .env*.local

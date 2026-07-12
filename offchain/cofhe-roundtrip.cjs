@@ -2,7 +2,7 @@
 // Live CoFHE round trip against the deployed ConfidentialAuthority on
 // Arbitrum Sepolia: encrypt a budget → grant → act (encrypted amount) →
 // unseal the remaining budget. Puts real AuthorityGranted/ActionAnchored
-// events on the contract — the encrypted check running for real, end to end.
+// events on the contract - the encrypted check running for real, end to end.
 //
 // Run from repo root: node offchain/cofhe-roundtrip.cjs
 // Reads PRIVATE_KEY (hero_user testnet burner) from ./.env.
@@ -62,7 +62,7 @@ const main = async () => {
   }));
 
   const contract = new ethers.Contract(CA, CA_ABI, wallet);
-  // fresh agent id per run — grantAuthority reverts on AgentExists
+  // fresh agent id per run - grantAuthority reverts on AgentExists
   const agentId = ethers.id(`openhouse-live-${Date.now()}`);
   console.log(`agentId ${agentId.slice(0, 18)}…`);
 
@@ -91,12 +91,12 @@ const main = async () => {
   console.log(`   within = ${within}`);
 
   const [, count] = await contract.agentInfo(me, agentId);
-  console.log(`\nDONE — real encrypted round trip on Arbitrum Sepolia.`);
+  console.log(`\nDONE - real encrypted round trip on Arbitrum Sepolia.`);
   console.log(`grant: ${EXPLORER}/tx/${tx1.hash}`);
   console.log(`act:   ${EXPLORER}/tx/${tx2.hash}`);
   console.log(`agent actionCount=${count} · remaining=${remaining} · within=${within}`);
   if (Number(remaining) !== 700 || !(within === true || within === 1n || within === 1)) {
-    console.log("⚠ values differ from expectation — inspect before quoting");
+    console.log("⚠ values differ from expectation - inspect before quoting");
     process.exitCode = 1;
   }
 };

@@ -1,4 +1,4 @@
-// Hero Proof of Action — off-chain (L1) -> on-chain anchor (L3) demo.
+// Hero Proof of Action - off-chain (L1) -> on-chain anchor (L3) demo.
 // Run with no env vars to just compute the root (offline).
 // Set RPC_URL + PRIVATE_KEY + ANCHOR_ADDRESS to actually anchor on Arbitrum Sepolia.
 import { ethers } from "ethers";

@@ -24,7 +24,7 @@ const row = (within: boolean | null, i: number): FleetLedgerRow => ({
   tx: "0xtx" + i,
 });
 
-describe("stageCaption — narrates in the deck's evidence vocabulary", () => {
+describe("stageCaption - narrates in the deck's evidence vocabulary", () => {
   it("prompts to start when idle with an empty ledger", () => {
     const c = stageCaption(view(), null);
     expect(c).not.toBeNull();

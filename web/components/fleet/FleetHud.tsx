@@ -38,7 +38,7 @@ export function FleetHud({ view, actions }: { view: FleetView; actions: FleetAct
           <Btn variant="ghost" onClick={actions.reset}>Reset</Btn>
         </div>
 
-        {/* current status — always visible near the top, so it isn't buried in
+        {/* current status - always visible near the top, so it isn't buried in
             the console at the bottom of the scrolling panel */}
         {view.log.length > 0 &&
           (() => {
@@ -86,7 +86,7 @@ export function FleetHud({ view, actions }: { view: FleetView; actions: FleetAct
         {/* over-spend callout */}
         {view.ledger.some((r) => r.within === false) && (
           <div className="rounded-lg border border-line2 bg-panel2 px-2.5 py-2 font-mono text-[10.5px] leading-[1.5] text-amber">
-            ⚠ A robot exceeded its authority — the action is still proven and anchored, its budget is untouched, and
+            ⚠ A robot exceeded its authority - the action is still proven and anchored, its budget is untouched, and
             nothing leaked. That&apos;s the moat.
           </div>
         )}
@@ -176,7 +176,7 @@ export function FleetHud({ view, actions }: { view: FleetView; actions: FleetAct
         </div>
 
         <div className="font-mono text-[9px] leading-[1.5] text-dim">
-          Simulated attestation — an L2 stand-in for a TEE quote (roadmap). With <b className="text-white">On-chain</b>,
+          Simulated attestation - an L2 stand-in for a TEE quote (roadmap). With <b className="text-white">On-chain</b>,
           each action anchors a REAL tx on <b className="text-white">{view.chainLabel}</b>
           {view.explorer && <> (verify every anchor on Arbiscan)</>}; the encrypted-authority check stays simulated
           (CoFHE is not in this anchor path). Only the operator can unseal a budget.

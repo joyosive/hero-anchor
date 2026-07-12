@@ -60,7 +60,7 @@ contract ConfidentialAuthorityTest is CofheTest {
         bytes32 root = keccak256("action-over");
         _act(5000, root);
 
-        // budget unchanged — branchless no-op, no revert, no leak
+        // budget unchanged - branchless no-op, no revert, no leak
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(1000));
         // compliance flag says "outside authority"
         expectPlaintext(ca.wasWithinAuthority(root), false);
@@ -115,7 +115,7 @@ contract ConfidentialAuthorityTest is CofheTest {
         bob.connect(0xB0B);
         InEuint32 memory bl = bob.createInEuint32(500);
         vm.prank(bob.account());
-        ca.grantAuthority(AGENT, bl); // same label, different operator — must succeed
+        ca.grantAuthority(AGENT, bl); // same label, different operator - must succeed
 
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(1000));
         expectPlaintext(ca.remainingAuthority(bob.account(), AGENT), uint32(500));
@@ -132,7 +132,7 @@ contract ConfidentialAuthorityTest is CofheTest {
         anchor.anchor(root);
 
         // the operator's action must still succeed (not revert) and record
-        // the confidential state — the pre-anchor does not block it
+        // the confidential state - the pre-anchor does not block it
         _act(300, root);
 
         expectPlaintext(ca.remainingAuthority(op.account(), AGENT), uint32(700));

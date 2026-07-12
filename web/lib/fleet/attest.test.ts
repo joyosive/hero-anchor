@@ -21,7 +21,7 @@ describe("attest", () => {
     expect(attest(rec)).toEqual(a); // deterministic
   });
 
-  it("binds all three phases — changing any phase changes the root", () => {
+  it("binds all three phases - changing any phase changes the root", () => {
     const base = attestRoot(rec);
     expect(attestRoot({ ...rec, decision: { ...rec.decision, cost: 121 } })).not.toEqual(base);
     expect(attestRoot({ ...rec, action: { ...rec.action, result: "x" } })).not.toEqual(base);

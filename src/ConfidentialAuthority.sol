@@ -6,7 +6,7 @@ import {IHeroProofAnchor} from "./IHeroProofAnchor.sol";
 
 /// @title ConfidentialAuthority
 /// @notice Hero L3+ : enforce an autonomous agent's authority on ENCRYPTED data and
-///         anchor a public proof-of-action — without revealing the authority or the
+///         anchor a public proof-of-action - without revealing the authority or the
 ///         action. Verifiable (anchored on Arbitrum, via HeroProofAnchor) AND
 ///         confidential (enforced on ciphertext via Fhenix CoFHE).
 /// @dev    The "within authority" check is a homomorphic comparison that returns an
@@ -71,7 +71,7 @@ contract ConfidentialAuthority {
 
     /// @notice The operator's agent acts. Prove the action is within its ENCRYPTED
     ///         authority on ciphertext, decrement the encrypted remaining, and anchor a
-    ///         public proof. Only the operator that granted the agent can call this —
+    ///         public proof. Only the operator that granted the agent can call this -
     ///         the (operator, agentId) key derives from msg.sender.
     /// @param agentId   The acting agent (operator-scoped).
     /// @param encAmount Proof-backed encrypted magnitude of the action (e.g. spend).

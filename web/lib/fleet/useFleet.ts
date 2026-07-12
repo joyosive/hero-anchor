@@ -15,7 +15,7 @@ import { SimBrain } from "./brain";
 import { runCycle } from "./robot";
 import type { FleetView, FleetLedgerRow, RobotView } from "./types";
 
-const MAX_STEPS = 6; // two full script rounds — enough to show within/over per robot
+const MAX_STEPS = 6; // two full script rounds - enough to show within/over per robot
 const time = () => new Date().toLocaleTimeString([], { hour12: false });
 const reduced = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -240,7 +240,7 @@ export function useFleet() {
     if (v && !chain) {
       setView({ onChain: false });
       log(
-        "No on-chain target — relayer offline and no local burner/anvil. Staying in sim.",
+        "No on-chain target - relayer offline and no local burner/anvil. Staying in sim.",
         "err",
       );
       return;
