@@ -12,6 +12,7 @@ const TABS = [
   { key: "stage", label: "Live Demo", href: "/fleet?stage=1" },
   { key: "fleet", label: "Operator Console", href: "/fleet" },
   { key: "proof", label: "How It Works", href: "/proof" },
+  { key: "log", label: "Hero Worker", href: "/log" },
 ] as const;
 
 // The one site header, rendered once from the root layout so it persists across
@@ -24,7 +25,14 @@ export function SiteHeader() {
 
   if (pathname === "/fleet" && stage) return null;
 
-  const current = pathname === "/fleet" ? "fleet" : pathname === "/proof" ? "proof" : "home";
+  const current =
+    pathname === "/fleet"
+      ? "fleet"
+      : pathname === "/proof"
+        ? "proof"
+        : pathname === "/log"
+          ? "log"
+          : "home";
   // inline style guarantees active-pill contrast regardless of global link styles
   const activeStyle = (key: string) =>
     key === current ? { color: "#0A0B09", backgroundColor: "#AAFF00" } : undefined;
