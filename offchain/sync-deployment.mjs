@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// After `make deploy-verify`, copy the freshly deployed addresses from forge's
-// broadcast artifact into web/lib/deployed.sepolia.json, so the frontend wires
-// up automatically: HeroProofAnchor -> fleet anchoring, ConfidentialAuthority ->
-// single-agent live path. Run standalone with `make sync-sepolia` too.
+// After `make deploy`, write the live addresses into web/lib/deployed.sepolia.json
+// so the frontend wires up automatically. The Rust/Stylus anchor is deployed
+// separately (cargo stylus) and is not in the forge broadcast, so it comes from
+// ANCHOR_ADDRESS; the Solidity ConfidentialAuthority is read from the broadcast.
+// Run standalone with `make sync-sepolia` (pass ANCHOR_ADDRESS) too.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -32,13 +33,15 @@ const addrOf = (name) => {
   return tx ? tx.contractAddress : null;
 };
 
-const anchor = addrOf("HeroProofAnchor");
+// The Rust/Stylus anchor is deployed with cargo stylus, so it is not in the
+// forge broadcast: take it from ANCHOR_ADDRESS. The CA is a forge deploy.
+const anchor = process.env.ANCHOR_ADDRESS || null;
 const ca = addrOf("ConfidentialAuthority");
 
 if (!anchor || !ca) {
-  console.error("sync-deployment: could not find both contract addresses in the broadcast.");
-  console.error(`  HeroProofAnchor       -> ${anchor ?? "MISSING"}`);
-  console.error(`  ConfidentialAuthority -> ${ca ?? "MISSING"}`);
+  console.error("sync-deployment: need ANCHOR_ADDRESS (the Rust/Stylus anchor) plus the CA from the broadcast.");
+  console.error(`  anchor (ANCHOR_ADDRESS) -> ${anchor ?? "MISSING"}`);
+  console.error(`  ConfidentialAuthority   -> ${ca ?? "MISSING"}`);
   process.exit(1);
 }
 

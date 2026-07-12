@@ -7,14 +7,17 @@
 // Run from repo root: node offchain/cofhe-roundtrip.cjs
 // Reads PRIVATE_KEY (hero_user testnet burner) from ./.env.
 //
-// STATUS 2026-07-09: blocked upstream. cofhejs@0.3.1 (latest) fails in
-// initializeWithEthers fetching the coprocessor's FHE public key:
+// STATUS 2026-07-11 (re-verified): still blocked upstream. cofhejs@0.3.1 is
+// still the latest and still fails in initializeWithEthers fetching the
+// coprocessor's FHE public key:
 //   Error serializing public key: Custom("invalid value: integer
 //   7809075072243073024, expected usize")
-// i.e. the Arbitrum Sepolia CoFHE key server's format has drifted ahead of
-// the newest released client. Re-run this script unchanged when Fhenix ships
-// a compatible cofhejs; the contract side is deployed, verified, and fully
-// unit-tested against the CoFHE mocks.
+// i.e. the Arbitrum Sepolia CoFHE key server's format has drifted ahead of the
+// newest released client. This script already targets the live CA (read from
+// deployed.sepolia.json) with the current namespaced ABI; re-run it unchanged
+// when Fhenix ships a compatible cofhejs. The contract side is deployed,
+// source-verified on Arbiscan, and fully unit-tested against the CoFHE mocks
+// (forge 21/21).
 
 const { readFileSync } = require("node:fs");
 const { ethers } = require("ethers");
