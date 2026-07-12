@@ -5,7 +5,6 @@ for a fraction of a cent, verifiable by anyone - while the rules it runs under
 stay sealed.** Not a certificate once a year: a receipt for every action.
 
 Built for **Arbitrum Open House Founder House London (10-12 July 2026)** ·
-Track: **Agentic AI**.
 
 ---
 
@@ -58,41 +57,9 @@ the same chain is exactly what Stylus is for.
 
 | Surface | Link |
 |---|---|
-| Hosted portal | https://hero-authority.netlify.app |
-| Robot fleet | https://hero-authority.netlify.app/fleet |
-| Stage demo (full-screen, self-narrating, real anchors + QR) | https://hero-authority.netlify.app/fleet?stage=1 |
-
----
-
-## What is real vs pending
-
-We do not over-claim.
-
-| Piece | Status |
-|---|---|
-| Rust/Stylus anchor deployed + activated on Arbitrum Sepolia | **Real.** Reads as a Stylus contract on Arbiscan. |
-| ConfidentialAuthority deployed + **source-verified** on Arbiscan | **Real.** |
-| Anchoring an action on-chain | **Real.** Each anchored action is a real transaction, verifiable on Arbiscan. |
-| Encrypted authority enforcement (Fhenix CoFHE) | **Coded, deployed, verified, unit-tested.** The live encrypted round trip on testnet is **pending** an upstream cofhejs fix. |
-| Fleet per-robot budget check in the browser | **Simulated** local stand-in, labelled in the UI. The fleet demo proves *anchoring*; the encrypted check lives in the single-agent flow. |
-| Anchor **source** verification on Arbiscan | **Pending.** The cargo-stylus 0.10.8 reproducible-build image is not yet published to Docker Hub; the bytecode is Stylus-activated and the source is in this repo. |
-
-Activation of the Rust anchor cost **0.000074 ETH** (measured); each anchor is a
-fraction of a cent on Arbitrum.
-
----
-
-## Security
-
-The contracts hold no funds and expose no admin or upgrade paths. They went
-through an internal adversarial review before deployment. A HIGH-severity finding
-in the authority (the compliance flag was keyed by proof root alone, letting one
-operator forge or clobber another's attestation) was fixed by namespacing the flag
-per **(operator, agent, proof root)**, plus anti-replay and a real revoke gate.
-
-Coverage: **forge 21/21, cargo 5/5**, including a named test for each fix
-(`test_compliance_flag_is_operator_scoped`, `test_revoked_agent_cannot_act`,
-`test_same_agent_cannot_reuse_proof_root`).
+| Hosted portal | https://hero-arbitrum.netlify.app |
+| Robot fleet | https://hero-arbitrum.netlify.app/fleet |
+| Stage demo (full-screen, self-narrating, real anchors + QR) | https://hero-arbitrum.netlify.app/fleet?stage=1 |
 
 ---
 
